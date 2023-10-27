@@ -1,0 +1,93 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "width": 900,
+    "height": 560,
+    "padding": {"top": 0, "left": 0, "right": 0, "bottom": 0},
+    "signals": [
+      {
+        "name": "tooltip",
+        "value": {},
+        "on": [
+          {"events": "geopoint:mouseover", "update": "datum"},
+          {"events": "geopoint:mouseout", "update": "{}"}
+        ]
+      }
+    ],
+    "data": [
+      {
+        "name": "states",
+        "url": "data/world-110m.json",
+        "format": {"type": "topojson", "feature": "countries"},
+        "transform": [
+          {
+            "type": "geopath",
+            "projection": "projection"
+          }
+        ]
+      },
+      {
+        "name": "crashes",
+        "values": [
+          {"crash": "Hillerød", "longitude": 12.3, "latitude": 55.93}
+        ],
+        "transform": [
+          {
+            "type": "geopoint",
+            "projection": "projection",
+            "fields": ["longitude", "latitude"]
+          },
+          {
+            "type": "filter",
+            "expr": "datum.x != null && datum.y != null"
+          }
+        ]
+      }
+    ],
+    "scales": [],
+    "projections": [
+      {
+        "name": "projection",
+        "type": "mercator",
+        "scale": 400,
+        "translate": [{"signal": "width / 2"}, {"signal": "height / 2"}]
+      }
+    ],
+    "marks": [
+      {
+        "type": "path",
+        "from": {"data": "states"},
+        "encode": {
+          "enter": {
+            "fill": {"value": "#dedede"},
+            "stroke": {"value": "white"}
+          },
+          "update": {
+            "path": {"field": "path"}
+          }
+        }
+      },
+      {
+        "type": "symbol",
+        "from": {"data": "crashes"},
+        "encode": {
+          "enter": {
+            "size": {"value": 160},
+            "fill": {"value": "steelblue"},
+            "fillOpacity": {"value": 0.8},
+            "stroke": {"value": "white"},
+            "strokeWidth": {"value": 1.5},
+            "tooltip": {"signal": "datum.x"}
+          },
+          "update": {
+            "x": {"field": "x"},
+            "y": {"field": "y"},
+            "fill": {"value": "steelblue"}
+          },
+          "hover": {
+            "fill": {"value": "red"}
+          }
+        }
+      }
+    ]
+  }
+  
