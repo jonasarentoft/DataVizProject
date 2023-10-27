@@ -89,7 +89,7 @@
       },
       {
         "name": "crashes",
-        "url": "../data/subsetPlaneCrashFakeCoords.csv",
+        "url": "../preprocessing/plane_crash_coordinates.csv",
         "format": {"type": "csv", "parse": "auto"},
         "transform": [
           {
@@ -135,7 +135,7 @@
             "fillOpacity": {"value": 0.8},
             "stroke": {"value": "white"},
             "strokeWidth": {"value": 1.5},
-            "tooltip": {"signal": "datum.X"}
+            "tooltip": {"signal": "datum.Location"}
           },
           "update": {
             "x": {"field": "x"},
