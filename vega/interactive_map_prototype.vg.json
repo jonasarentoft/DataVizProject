@@ -3,6 +3,7 @@
     "width": 900,
     "height": 560,
     "padding": {"top": 0, "left": 0, "right": 0, "bottom": 0},
+    "autosize": "none",
     "signals": [
       {
         "name": "tooltip",
@@ -13,16 +14,67 @@
         ]
       },
       {
-        "name": "zoom",
-        "value": 1,
-        "on": [
-          {
-            "events": {"type": "wheel", "consume": true},
-            "update": "clamp(zoom * pow(1.001, -event.deltaY * pow(16, event.deltaMode)), 0.1, 10)"
-          }
-        ]
+        "name": "scale",
+        "value": 150,
+        "on": [{
+          "events": {"type": "wheel", "consume": true},
+          "update": "clamp(scale * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+        }]
+      },
+      {
+        "name": "angles",
+        "value": [0, 0],
+        "on": [{
+          "events": "mousedown",
+          "update": "[rotateX, centerY]"
+        }]
+      },
+      {
+        "name": "cloned",
+        "value": null,
+        "on": [{
+          "events": "mousedown",
+          "update": "copy('projection')"
+        }]
+      },
+      {
+        "name": "start",
+        "value": null,
+        "on": [{
+          "events": "mousedown",
+          "update": "invert(cloned, xy())"
+        }]
+      },
+      {
+        "name": "drag", "value": null,
+        "on": [{
+          "events": "[mousedown, window:mouseup] > window:mousemove",
+          "update": "invert(cloned, xy())"
+        }]
+      },
+      {
+        "name": "delta", "value": null,
+        "on": [{
+          "events": {"signal": "drag"},
+          "update": "[drag[0] - start[0], start[1] - drag[1]]"
+        }]
+      },
+      {
+        "name": "rotateX", "value": 0,
+        "on": [{
+          "events": {"signal": "delta"},
+          "update": "angles[0] + delta[0]"
+        }]
+      },
+      {
+        "name": "centerY", "value": 0,
+        "on": [{
+          "events": {"signal": "delta"},
+          "update": "clamp(angles[1] + delta[1], -60, 60)"
+        }]
       }
     ],
+
     "data": [
       {
         "name": "world",
@@ -53,7 +105,9 @@
       {
         "name": "projection",
         "type": "mercator",
-        "scale": {"signal": "zoom * 400"},
+        "scale": {"signal": "scale"},
+        "rotate": [{"signal": "rotateX"}, 0, 0],
+        "center": [0, {"signal": "centerY"}],
         "translate": [{"signal": "width / 2"}, {"signal": "height / 2"}]
       }
     ],
