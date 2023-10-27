@@ -15,8 +15,8 @@
     ],
     "data": [
       {
-        "name": "states",
-        "url": "data/world-110m.json",
+        "name": "world",
+        "url": "../data/world-110m.json",
         "format": {"type": "topojson", "feature": "countries"},
         "transform": [
           {
@@ -27,18 +27,13 @@
       },
       {
         "name": "crashes",
-        "values": [
-          {"crash": "Hillerød", "longitude": 12.3, "latitude": 55.93}
-        ],
+        "url": "../data/subsetPlaneCrashFakeCoords.csv",
+        "format": {"type": "csv", "parse": "auto"},
         "transform": [
           {
             "type": "geopoint",
             "projection": "projection",
-            "fields": ["longitude", "latitude"]
-          },
-          {
-            "type": "filter",
-            "expr": "datum.x != null && datum.y != null"
+            "fields": ["Longitude", "Latitude"]
           }
         ]
       }
@@ -55,7 +50,7 @@
     "marks": [
       {
         "type": "path",
-        "from": {"data": "states"},
+        "from": {"data": "world"},
         "encode": {
           "enter": {
             "fill": {"value": "#dedede"},
@@ -76,7 +71,7 @@
             "fillOpacity": {"value": 0.8},
             "stroke": {"value": "white"},
             "strokeWidth": {"value": 1.5},
-            "tooltip": {"signal": "datum.x"}
+            "tooltip": {"signal": "datum.X"}
           },
           "update": {
             "x": {"field": "x"},
