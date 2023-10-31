@@ -103,12 +103,6 @@
           },
           {
             "type": "filter", "expr": "datum.Fatalities <= numFatalities"
-          },
-          {
-            "type": "collect", "sort": {
-              "field": "Fatalities",
-              "order": "descending"
-            }
           }
         ]
       }
@@ -148,6 +142,7 @@
       {
         "type": "symbol",
         "from": {"data": "crashes"},
+        "sort": {"field": "datum.Fatalities", "order":"descending"},
         "encode": {          
           "enter": {
             "size": {"scale": "size", "field": "Fatalities"}, 
