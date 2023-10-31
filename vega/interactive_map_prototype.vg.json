@@ -74,8 +74,8 @@
         }]
       },
       {
-        "name": "numFatalities", "value": 10,
-        "bind": {"input": "range", "min": 0, "max": 583}
+        "name": "numFatalities", "value": 550,
+        "bind": {"input": "range", "min": 0, "max": 590}
       }
     ],
 
@@ -100,22 +100,27 @@
             "type": "geopoint",
             "projection": "projection",
             "fields": ["Longitude", "Latitude"]
-
+          },
+          {
+            "type": "filter", "expr": "datum.Fatalities <= numFatalities"
+          },
+          {
+            "type": "collect", "sort": {
+              "field": "Fatalities",
+              "order": "descending"
+            }
           }
         ]
-      },
-      {
-        "name": "crashesFilteredFatalities",
-        "source": "crashes",
-        "transform": [{"type": "filter", "expr": "datum.Fatalities <= numFatalities"}]
-      },
-      {
-        "name": "sampledCrashes",
-        "source": "crashesFilteredFatalities",
-        "transform": [{"type": "sample", "size": 50}]
       }
     ],
-    "scales": [],
+    "scales": [
+      {
+        "name": "size",
+        "type": "linear",
+        "domain": [0,583],
+        "range": [16, 1000]
+      }
+    ],
     "projections": [
       {
         "name": "projection",
@@ -142,20 +147,20 @@
       },
       {
         "type": "symbol",
-        "from": {"data": "crashesFilteredFatalities"},
+        "from": {"data": "crashes"},
         "encode": {          
           "enter": {
+            "size": {"scale": "size", "field": "Fatalities"}, 
             "shape": {"value": "circle"},
             "fill": {"value": "steelblue"},
             "fillOpacity": {"value": 0.8},
             "stroke": {"value": "white"},
             "strokeWidth": {"value": 1.5},
             "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities,'Observation': datum.X}"}
-          },
+          },        
           "update": {
             "x": {"field": "x"},
             "y": {"field": "y"},
-            "size": {"signal": "datum.Fatalities*4"},
             "fill": {"value": "steelblue"}
           },
           "hover": {
