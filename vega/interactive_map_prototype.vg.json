@@ -76,6 +76,27 @@
       {
         "name": "numFatalities", "value": 550,
         "bind": {"input": "range", "min": 0, "max": 590}
+      },
+      {
+        "name": "selectManufacturer", "value": "All",
+        "bind": {
+          "name": "Select Manufacturer",
+          "input": "select",
+          "options": ["All", "Other", "Curtiss", "Zeppelin", "deHavilland", "Farman", "Junkers",
+          "Breguet", "Handley Page", "Avro", "Bristol", "Missing value",
+          "Bleriot", "Liore et Olivier", "Fokker", "Sikorsky", "Douglas",
+          "Dornier", "Fairchild", "Latecoere", "Boeing", "Ford", "Vickers",
+          "Travel", "Stearman", "Lockheed", "Short", "Savoia Marchetti",
+          "Heinkel", "Stinson", "Dewoitine", "Consolidated", "Tupolev",
+          "Antonov", "Martin", "Curtiss Wright", "Grumman", "GAZ",
+          "Ilyushin", "Hawker Siddeley", "Convair", "Canadair", "Aero",
+          "Let", "Saab", "Beechcraft", "Nord", "Sud Aviation",
+          "McDonnell Douglas", "Avia", "Piper", "BAC", "Cessna", "Bell",
+          "Learjet", "Mil", "Fairchild Hiller", "Britten Norman", "Pilatus",
+          "Aerospatiale", "Gates", "NAMC", "Yakovlev", "Embraer", "IAI",
+          "GAF", "Airbus", "British", "CASA", "Swearingen", "Dassault",
+          "ATR", "Eurocopter", "Rockwell", "BAE"]
+        }
       }
     ],
 
@@ -103,7 +124,8 @@
           },
           {
             "type": "filter", "expr": "datum.Fatalities <= numFatalities"
-          }
+          },
+          {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"}
         ]
       }
     ],
