@@ -1,0 +1,51 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "description": "A timeline visualization with a custom range from 0 to 600.",
+    "width": 500,
+    "height": 20,
+    "padding": 0,
+    
+    "data": [
+      {
+        "name": "timeLine",
+        "values": [
+          {
+            "label": "interval",
+            "enter": 0,
+            "leave": 600
+          }
+        ]
+      }
+    ],
+  
+    "scales": [
+      {
+        "name": "xscale",
+        "type": "linear",
+        "range": "width",
+        "round": true,
+        "domain": [0, 600]
+      }
+    ],
+  
+    "axes": [
+      {"orient": "bottom", "scale": "xscale", "format": "d"}
+    ],
+  
+    "marks": [
+      {
+        "type": "rect",
+        "from": {"data": "timeLine"},
+        "encode": {
+          "enter": {
+            "x": {"scale": "xscale", "field": "enter"},
+            "x2": {"scale": "xscale", "field": "leave"},
+            "y": {"value": 20},
+            "height": {"value": 3},
+            "fill": {"value": "#557"}
+          }
+        }
+      }
+    ]
+  }
+  
