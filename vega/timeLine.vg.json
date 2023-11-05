@@ -1,112 +1,135 @@
 {
-    "$schema": "https://vega.github.io/schema/vega/v5.json",
-    "description": "A timeline visualization with a custom range from 0 to 600.",
-    "width": 500,
-    "height": 20,
-    "padding": 5,
-    "signals": [
-      {
-        "name": "count",
-        "value": 0,
-        "on":[
-          {"events": "rect:dblclick", "update": "count + 1"}
-        ]
-      },
-      {
-        "name": "brushX", "value": 0,
-        "on": [
-          {
-            "events": "rect:mousedown",
-            "update": "[x(), x()]"
-          },
-          {
-            "events": "[rect:mousedown, window:mouseup] > window:mousemove",
-            "update": "[brushX[0], clamp(x(), 0, width)]"
-          }
-        ]
-      }
-    ],
-    
-    "data": [
-      {
-        "name": "timeLine",
-        "values": [
-          {
-            "label": "interval",
-            "enter": 0,
-            "leave": 600
-          }
-        ]
-      }
-    ],
-  
-    "scales": [
-      {
-        "name": "xscale",
-        "type": "linear",
-        "range": "width",
-        "round": true,
-        "domain": [0, 600]
-      }
-    ],
-  
-    "axes": [
-      {"orient": "bottom", "scale": "xscale", "format": "d"}
-    ],
-  
-    "marks": [
-      {
-        "type": "rect",
-        "from": {"data": "timeLine"},
-        "encode": {
-          "enter": {
-            "x": {"scale": "xscale", "field": "enter"},
-            "x2": {"scale": "xscale", "field": "leave"},
-            "y": {"value": 20},
-            "height": {"value": 10},
-            "fill": {"value": "#557"}
-          }
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "A timeline visualization with a custom range from 0 to 600.",
+  "width": 500,
+  "height": 20,
+  "padding": 5,
+  "signals": [
+    {
+      "name": "count",
+      "value": 0,
+      "on":[
+        {"events": "dblclick", "update": "count + 1"}
+      ]
+    },
+    {
+      "name": "brushX", "value": 0,
+      "on": [
+        {
+          "events": "mousedown",
+          "update": "[x(), x()]"
+        },
+        {
+          "events": "[mousedown, window:mouseup] > window:mousemove",
+          "update": "[brushX[0], clamp(x(), 0, width)]"
         }
-      },
-      {
-        "type": "rect",
-        "name": "brush",
-        "encode": {
-          "enter":{
-            "fill":{"value":"transparent"}
-          },
-          "update": {
-            "x": {"signal": "brushX[0]"},
-            "x2": {"signal": "brushX[1]"}
-          }
+      ]
+    }
+  ],
+  
+  "data": [
+    {
+      "name": "timeLine",
+      "values": [
+        {
+          "label": "interval",
+          "enter": 0,
+          "leave": 600
         }
-      },
-      {
-        "type": "rect",
-        "encode": {
-          "enter": {
-            "fill": {"value": "#eee"}
-          },
-          "update":{
-            "x": {"signal": "brushX[0]"},
-            "x2": {"signal": "brushX[1]"}
-          }
-        }
+      ]
+    }
+  ],
 
-      },
-      {
-        "type": "text",
-        "encode": {
-          "update": {
-            "x": {"value": 300},
-            "y": {"value": 10},
-            "fill": {"value": "black"},
-            "fontSize": {"value": 20},
-            "align": {"value": "right"},
-            "text": {"signal": "count"}
-          }
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "linear",
+      "range": "width",
+      "round": true,
+      "domain": [0, 600]
+    }
+  ],
+
+  "axes": [
+    {"orient": "bottom", "scale": "xscale", "format": "d"}
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "timeLine"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "enter"},
+          "x2": {"scale": "xscale", "field": "leave"},
+          "y": {"value": 20},
+          "height": {"value": 3},
+          "fill": {"value": "#557"}
         }
       }
-    ]
-  }
-  
+    },
+    {
+      "type": "rect",
+      "name": "brush",
+      "encode": {
+        "enter":{
+          "fill":{"value":"transparent"}
+        },
+        "update": {
+          "x": {"signal": "brushX[0]"},
+          "x2": {"signal": "brushX[1]"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "encode": {
+        "enter": {
+          "fill": {"value": "#eee"}
+        },
+        "update":{
+          "x": {"signal": "brushX[0]"},
+          "x2": {"signal": "brushX[1]"}
+        }
+      }
+
+    },
+    {
+      "type": "symbol",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 20}
+        },
+        "update":{
+          "x": {"signal": "brushX[0]"}
+        }
+      }
+    },
+    {
+      "type": "symbol",
+      "encode": {
+        "enter": {
+          "x": {"value": 600},
+          "y": {"value": 20}
+        },
+        "update":{
+          "x": {"signal": "brushX[1]"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "update": {
+          "x": {"value": 300},
+          "y": {"value": 0},
+          "fill": {"value": "black"},
+          "fontSize": {"value": 10},
+          "align": {"value": "right"},
+          "text": {"signal": "brushX"}
+        }
+      }
+    }
+  ]
+}
