@@ -9,7 +9,20 @@
         "name": "count",
         "value": 0,
         "on":[
-          {"events": "rect:mouseover", "update": "count + 1"}
+          {"events": "rect:dblclick", "update": "count + 1"}
+        ]
+      },
+      {
+        "name": "brushX", "value": 0,
+        "on": [
+          {
+            "events": "rect:mousedown",
+            "update": "[x(), x()]"
+          },
+          {
+            "events": "[rect:mousedown, window:mouseup] > window:mousemove",
+            "update": "[brushX[0], clamp(x(), 0, width)]"
+          }
         ]
       }
     ],
@@ -50,10 +63,36 @@
             "x": {"scale": "xscale", "field": "enter"},
             "x2": {"scale": "xscale", "field": "leave"},
             "y": {"value": 20},
-            "height": {"value": 3},
+            "height": {"value": 10},
             "fill": {"value": "#557"}
           }
         }
+      },
+      {
+        "type": "rect",
+        "name": "brush",
+        "encode": {
+          "enter":{
+            "fill":{"value":"transparent"}
+          },
+          "update": {
+            "x": {"signal": "brushX[0]"},
+            "x2": {"signal": "brushX[1]"}
+          }
+        }
+      },
+      {
+        "type": "rect",
+        "encode": {
+          "enter": {
+            "fill": {"value": "#eee"}
+          },
+          "update":{
+            "x": {"signal": "brushX[0]"},
+            "x2": {"signal": "brushX[1]"}
+          }
+        }
+
       },
       {
         "type": "text",
