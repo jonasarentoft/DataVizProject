@@ -3,7 +3,16 @@
     "description": "A timeline visualization with a custom range from 0 to 600.",
     "width": 500,
     "height": 20,
-    "padding": 0,
+    "padding": 5,
+    "signals": [
+      {
+        "name": "count",
+        "value": 0,
+        "on":[
+          {"events": "rect:mouseover", "update": "count + 1"}
+        ]
+      }
+    ],
     
     "data": [
       {
@@ -43,6 +52,19 @@
             "y": {"value": 20},
             "height": {"value": 3},
             "fill": {"value": "#557"}
+          }
+        }
+      },
+      {
+        "type": "text",
+        "encode": {
+          "update": {
+            "x": {"value": 300},
+            "y": {"value": 10},
+            "fill": {"value": "black"},
+            "fontSize": {"value": 20},
+            "align": {"value": "right"},
+            "text": {"signal": "count"}
           }
         }
       }
