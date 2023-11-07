@@ -1,351 +1,356 @@
 {
-    "$schema": "https://vega.github.io/schema/vega/v5.json",
-    "padding": 5,
-    "width": 600,
-    "height": 400,
-    "autosize": "pad",
-    "layout": {"padding": 0, "columns": 1, "align": "each"
-    },
-    "signals": [
-      { "name": "mapWidth", "value": 600 },
-      { "name": "mapHeight", "value": 400 },
-      { "name": "fatalityLineWidth", "value": 300 },
-      { "name": "fatalityLineHeight", "value": 20 },
-      { "name": "fatalityExtent", "value": [0, 600] },
-      {
-        "name": "fatalityBrush", "update": "fatalityExtent",
-        "on": [
-          {
-            "events":"@selectionBar:mousedown",
-            "update": "[invert('fatalityScale', x()), invert('fatalityScale', x())]"
-          },
-          {
-            "events": "[@selectionBar:mousedown, window:mouseup] > window:mousemove!",
-            "update": 
-            "[clamp(min(fatalityAnchor, invert('fatalityScale', x())),0,fatalityExtent[1]), clamp(max(fatalityAnchor, invert('fatalityScale', x())),0,fatalityExtent[1])]"
-          }
-        ]
-      },
-      {
-        "name": "fatalityAnchor", "value": 0,
-        "on": [
-          {
-            "events": "mousedown!",
-            "update": "invert('fatalityScale', x())"
-          }
-        ]
-      },
-      {
-        "name": "scroll",
-        "value": 150,
-        "on": [
-          {
-            "events": { "type": "wheel", "consume": true },
-            "update": "clamp(scroll * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
-          }
-        ]
-      },
-      {
-        "name": "angles",
-        "value": [0, 0],
-        "on": [
-          {
-            "events": "mousedown",
-            "update": "[rotateX, centerY]"
-          }
-        ]
-      },
-      {
-        "name": "cloned",
-        "value": null,
-        "on": [
-          {
-            "events": "mousedown",
-            "update": "copy('projection')"
-          }
-        ]
-      },
-      {
-        "name": "start",
-        "value": null,
-        "on": [
-          {
-            "events": "mousedown",
-            "update": "invert(cloned, xy())"
-          }
-        ]
-      },
-      {
-        "name": "drag",
-        "value": null,
-        "on": [
-          {
-            "events": "[mousedown, window:mouseup] > window:mousemove",
-            "update": "invert(cloned, xy())"
-          }
-        ]
-      },
-      {
-        "name": "delta",
-        "value": null,
-        "on": [
-          {
-            "events": { "signal": "drag" },
-            "update": "[drag[0] - start[0], start[1] - drag[1]]"
-          }
-        ]
-      },
-      {
-        "name": "rotateX",
-        "value": 0,
-        "on": [
-          {
-            "events": { "signal": "delta" },
-            "update": "angles[0] + delta[0]"
-          }
-        ]
-      },
-      {
-        "name": "centerY",
-        "value": 0,
-        "on": [
-          {
-            "events": { "signal": "delta" },
-            "update": "clamp(angles[1] + delta[1], -60, 60)"
-          }
-        ]
-      },
-      {
-        "name": "numFatalities",
-        "value": 550,
-        "bind": { "input": "range", "min": 0, "max": 590 }
-      },
-      {
-        "name": "selectManufacturer",
-        "value": "All",
-        "bind": {
-          "name": "Select Manufacturer",
-          "input": "select",
-          "options": [
-            "All", "Other", "Curtiss", "Zeppelin", "deHavilland", "Farman", "Junkers",
-            "Breguet", "Handley Page", "Avro", "Bristol", "Missing value",
-            "Bleriot", "Liore et Olivier", "Fokker", "Sikorsky", "Douglas",
-            "Dornier", "Fairchild", "Latecoere", "Boeing", "Ford", "Vickers",
-            "Travel", "Stearman", "Lockheed", "Short", "Savoia Marchetti",
-            "Heinkel", "Stinson", "Dewoitine", "Consolidated", "Tupolev",
-            "Antonov", "Martin", "Curtiss Wright", "Grumman", "GAZ",
-            "Ilyushin", "Hawker Siddeley", "Convair", "Canadair", "Aero",
-            "Let", "Saab", "Beechcraft", "Nord", "Sud Aviation",
-            "McDonnell Douglas", "Avia", "Piper", "BAC", "Cessna", "Bell",
-            "Learjet", "Mil", "Fairchild Hiller", "Britten Norman", "Pilatus",
-            "Aerospatiale", "Gates", "NAMC", "Yakovlev", "Embraer", "IAI",
-            "GAF", "Airbus", "British", "CASA", "Swearingen", "Dassault",
-            "ATR", "Eurocopter", "Rockwell", "BAE"
-          ]
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "padding": 5,
+  "width": 600,
+  "height": 400,
+  "autosize": "pad",
+  "layout": {
+    "padding": 0,
+    "columns": 1,
+    "align": "each"
+  },
+  "signals": [
+    { "name": "mapWidth", "value": 600 },
+    { "name": "mapHeight", "value": 400 },
+    { "name": "timeLinelWidth", "value": 300 },
+    { "name": "timeLineHeight", "value": 20 },
+    { "name": "timeExtent", "value": [0, 600] },
+    {
+      "name": "brush", "update": "timeExtent",
+      "on": [
+        {"events":"@selectionBar:mousedown, @invisibleRectangle:mousedown", "update": "[invert('timeScale', x()), invert('timeScale', x())]"},
+        {
+          "events": "[@selectionBar:mousedown, window:mouseup] > window:mousemove!, [@invisibleRectangle:mousedown, window:mouseup] > window:mousemove!",
+          "update": 
+          "[clamp(min(anchor, invert('timeScale', x())),0,width), clamp(max(anchor, invert('timeScale', x())),0,width)]"
         }
-      }
-    ],
-    "data": [
-      {
-        "name": "world",
-        "url": "../data/world-110m.json",
-        "format": { "type": "topojson", "feature": "countries" },
-        "transform": [
-          {
-            "type": "geopath",
-            "projection": "projection"
-          }
+      ]
+    },
+    {
+      "name": "anchor", "value": 0,
+      "on": [
+        {"events": "@selectionBar:mousedown!, @invisibleRectangle:mousedown!", "update": "invert('timeScale', x())"}
+      ]
+    },
+    {
+      "name": "scale",
+      "value": 150,
+      "on": [
+        {
+          "events": "@land:wheel!, @water:wheel!",
+          "update": "clamp(scale * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+        }
+      ]
+    },
+    {
+      "name": "angles",
+      "value": [0, 0],
+      "on": [
+        {"events": "@land:mousedown, @water:mousedown", "update": "[rotateX, centerY]"}
+      ]
+    },
+    {
+      "name": "cloned",
+      "value": null,
+      "on": [
+        {"events": "@land:mousedown, @water:mousedown", "update": "copy('projection')"}
+      ]
+    },
+    {
+      "name": "start",
+      "value": null,
+      "on": [
+        {"events": "@land:mousedown, @water:mousedown", "update": "invert(cloned, xy())"}
+      ]
+    },
+    {
+      "name": "drag",
+      "value": null,
+      "on": [
+        {
+          "events": "[@land:mousedown, window:mouseup] > window:mousemove, [@water:mousedown, window:mouseup] > window:mousemove",
+          "update": "invert(cloned, xy())"
+        }
+      ]
+    },
+    {
+      "name": "delta",
+      "value": null,
+      "on": [
+        {
+          "events": { "signal": "drag" },
+          "update": "[drag[0] - start[0], start[1] - drag[1]]"
+        }
+      ]
+    },
+    {
+      "name": "rotateX",
+      "value": 0,
+      "on": [
+        {
+          "events": { "signal": "delta" },
+          "update": "angles[0] + delta[0]"
+        }
+      ]
+    },
+    {
+      "name": "centerY",
+      "value": 0,
+      "on": [
+        {
+          "events": { "signal": "delta" },
+          "update": "clamp(angles[1] + delta[1], -60, 60)"
+        }
+      ]
+    },
+    {
+      "name": "selectManufacturer",
+      "value": "All",
+      "bind": {
+        "name": "Select Manufacturer",
+        "input": "select",
+        "options": [
+          "All", "Other", "Curtiss", "Zeppelin", "deHavilland", "Farman", "Junkers",
+          "Breguet", "Handley Page", "Avro", "Bristol", "Missing value",
+          "Bleriot", "Liore et Olivier", "Fokker", "Sikorsky", "Douglas",
+          "Dornier", "Fairchild", "Latecoere", "Boeing", "Ford", "Vickers",
+          "Travel", "Stearman", "Lockheed", "Short", "Savoia Marchetti",
+          "Heinkel", "Stinson", "Dewoitine", "Consolidated", "Tupolev",
+          "Antonov", "Martin", "Curtiss Wright", "Grumman", "GAZ",
+          "Ilyushin", "Hawker Siddeley", "Convair", "Canadair", "Aero",
+          "Let", "Saab", "Beechcraft", "Nord", "Sud Aviation",
+          "McDonnell Douglas", "Avia", "Piper", "BAC", "Cessna", "Bell",
+          "Learjet", "Mil", "Fairchild Hiller", "Britten Norman", "Pilatus",
+          "Aerospatiale", "Gates", "NAMC", "Yakovlev", "Embraer", "IAI",
+          "GAF", "Airbus", "British", "CASA", "Swearingen", "Dassault",
+          "ATR", "Eurocopter", "Rockwell", "BAE"
         ]
-      },
-      {
-        "name": "crashes",
-        "url": "../data/plane_crash_coordinatesV2.csv",
-        "format": {"type": "csv", "parse": "auto"},
-        "transform": [
-          {
-            "type": "geopoint",
-            "projection": "projection",
-            "fields": ["Longitude", "Latitude"]
-          },
-          {
-            "type": "filter", "expr": "datum.Fatalities <= numFatalities"
-          },
-          {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"}
-        ]
       }
-    ],
-    "scales": [
-      {
-        "name": "size",
-        "type": "linear",
-        "domain": [0, 583],
-        "range": [16, 1000]
-      }
-    ],
-    "projections": [
-      {
-        "name": "projection",
-        "type": "mercator",
-        "scale": { "signal": "scroll" },
-        "rotate": [{ "signal": "rotateX" }, 0, 0],
-        "center": [0, { "signal": "centerY" }],
-        "translate": [{ "signal": "width / 2" }, { "signal": "height / 2" }]
-      }
-    ],
-    "marks": [
-      {
-        "name": "interactiveMap",
-        "type": "group",
-        "encode": {
-          "enter": {
-            "width": { "signal": "mapWidth" },
-            "height": { "signal": "mapHeight" },
-            "clip": { "value": true }
-          }
+    }
+  ],
+  "data": [
+    {
+      "name": "world",
+      "url": "../data/world-110m.json",
+      "format": { "type": "topojson", "feature": "countries" },
+      "transform": [
+        {
+          "type": "geopath",
+          "projection": "projection"
+        }
+      ]
+    },
+    {
+      "name": "sphere",
+      "values": [{"type": "Sphere"}]
+    },
+    {
+      "name": "crashes",
+      "url": "../data/plane_crash_coordinatesV2.csv",
+      "format": {"type": "csv", "parse": "auto"},
+      "transform": [
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": ["Longitude", "Latitude"]
         },
-        "marks": [
-          {
-            "type": "path",
-            "from": { "data": "world" },
-            "encode": {
-              "enter": {
-                "fill": { "value": "#dedede" },
-                "stroke": { "value": "white" }
-              },
-              "update": {
-                "path": { "field": "path" }
-              }
+        {"type": "filter", "expr": "datum.Fatalities <= brush[1]"},
+        {"type": "filter", "expr": "datum.Fatalities >= brush[0]"},
+        {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"}
+        ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "size",
+      "type": "linear",
+      "domain": [0, 583],
+      "range": [16, 1000]
+    },
+    {
+      "name": "timeScale",
+      "type": "linear",
+      "round": true,
+      "domain": [0, {"signal": "timeLinelWidth*4"}],
+      "range": "width"
+    }
+  ],
+  "projections": [
+    {
+      "name": "projection",
+      "type": "mercator",
+      "scale": { "signal": "scale" },
+      "rotate": [{ "signal": "rotateX" }, 0, 0],
+      "center": [0, { "signal": "centerY" }],
+      "translate": [{ "signal": "width / 2" }, { "signal": "height / 2" }]
+    }
+  ],
+  "marks": [
+    {
+      "name": "interactiveMap",
+      "type": "group",
+      "encode": {
+        "enter": {
+          "width": { "signal": "mapWidth" },
+          "height": { "signal": "mapHeight" },
+          "clip": { "value": true }
+        }
+      },
+      "marks": [
+        {
+          "name": "water",
+          "type": "shape",
+          "from": {"data": "sphere"},
+          "encode": {
+            "enter": {
+              "fill": {"value": "aliceblue"}
             }
           },
-          {
-            "type": "symbol",
-            "from": {"data": "crashes"},
-            "sort": {"field": "datum.Fatalities", "order":"descending"},
-            "encode": {          
-              "enter": {
-                "size": {"scale": "size", "field": "Fatalities"}, 
-                "shape": {"value": "circle"},
-                "fill": {"value": "steelblue"},
-                "fillOpacity": {"value": 0.8},
-                "stroke": {"value": "white"},
-                "strokeWidth": {"value": 1.5},
-                "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities,'Observation': datum.X}"}
-              },        
-              "update": {
-                "x": {"field": "x"},
-                "y": {"field": "y"},
-                "fill": {"value": "steelblue"}
-              },
-              "hover": {
-                "fill": {"value": "red"}
-              }
-            }
-          }
-        ]
-      },
-      {
-        "name": "fatalitiesIntervalSelection",
-        "type": "group",
-        "signals": [
-          { "name": "width", "update": "fatalityLineWidth" },
-          { "name": "height", "update": "fatalityLineHeight" }
-        ],
-        "encode": {
-          "update": {
-            "width": { "signal": "fatalityLineWidth" },
-            "height": { "signal": "fatalityLineHeight" }
-          }
+          "transform": [
+            { "type": "geoshape", "projection": "projection" }
+          ]
         },
-        "scales": [
-          {
-            "name": "fatalityScale",
-            "type": "linear",
-            "round": true,
-            "domain": [0, 600],
-            "range": "width"
-          }
-        ],
-        "axes": [
-          { "orient": "bottom", "scale": "fatalityScale", "format": "d" }
-        ],
-        "data": [
-            {
-                "name": "fatalityLine",
-                "values": [
-                  {
-                    "label": "interval",
-                    "enter": 0,
-                    "leave": 600
-                  }
-                ]
-              }
-        ],
-        "marks": [
-            {
-                "type": "rect",
-                "name": "backgroundRectangle",
-                "from": {"data": "fatalityLine"},
-                "encode": {
-                  "enter": {
-                    "x": {"scale": "fatalityScale", "field": "enter"},
-                    "x2": {"scale": "fatalityScale", "field": "leave"},
-                    "y": {"value": 16},
-                    "height": {"value": 8},
-                    "fill": {"value": "#ececec"},
-                    "cornerRadius": {"value": 60}
-                  }
-                }
+        {
+          "name": "land",
+          "type": "path",
+          "from": { "data": "world" },
+          "encode": {
+            "enter": {
+              "fill": { "value": "#dedede" },
+              "stroke": { "value": "white" }
             },
+            "update": {
+              "path": { "field": "path" }
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "from": {"data": "crashes"},
+          "sort": {"field": "datum.Fatalities", "order":"descending"},
+          "encode": {
+            "enter": {
+              "size": {"scale": "size", "field": "Fatalities"}, 
+              "shape": {"value": "circle"},
+              "fill": {"value": "steelblue"},
+              "fillOpacity": {"value": 0.8},
+              "stroke": {"value": "white"},
+              "strokeWidth": {"value": 1.5},
+              "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities,'Observation': datum.X}"}
+            },
+            "update": {
+              "x": {"field": "x"},
+              "y": {"field": "y"},
+              "fill": {"value": "steelblue"}
+            },
+            "hover": {
+              "fill": {"value": "red"}
+            }               
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "signals": [
+        { "name": "width", "update": "timeLinelWidth" },
+        { "name": "height", "update": "timeLineHeight" }
+      ],
+      "encode": {
+        "update": {
+          "width": { "signal": "timeLinelWidth" },
+          "height": { "signal": "timeLineHeight" }
+        }
+      },
+      "axes": [
+        { "orient": "bottom", "scale": "timeScale", "format": "d" }
+      ],
+      "data": [
             {
-                "type": "rect",
-                "name": "selectionBar",
-                "encode": {
-                  "enter":{
-                    "x": {"value": 0},
-                    "x2": {"value": 600},
-                    "y": {"value": 16},
-                    "height": {"value": 8},
-                    "fill": {"value": "#0671ed"},
-                    "cornerRadius": {"value": 60}
-                  },
-                  "update":{
-                    "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"},
-                    "x2": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
-                  }
+              "name": "timeLine",
+              "values": [
+                {
+                  "label": "interval",
+                  "enter": 0,
+                  "leave": 600
                 }
-              },
-              {
-                "type": "symbol",
-                "name": "coordinate1",
-                "encode": {
-                  "enter": {
-                    "x": {"value": 0},
-                    "y": {"value": 20},
-                    "size": {"value": 300},
-                    "fill": {"value": "#0671ed"}
-                  },
-                  "update":{
-                    "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"}
-                  }
-                }
-              },
-              {
-                "type": "symbol",
-                "name": "coordinate2",
-                "encode": {
-                  "enter": {
-                    "x": {"value": 600},
-                    "y": {"value": 20},
-                    "size": {"value": 300},
-                    "fill": {"value": "#0671ed"}
-                  },
-                  "update":{
-                    "x": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
-                  }
-                }
-              }
-        ]
-      }
-    ]
+              ]
+            }
+      ],
+      "scales": [
+            {
+              "name": "timeScale",
+              "type": "linear",
+              "round": true,
+              "domain": [0, 600],
+              "range": "width"
+    }
+      ],
+      "marks": [
+        {
+          "type": "rect",
+          "name": "invisibleRectangle",
+          "from": {"data": "timeLine"},
+          "encode": {
+            "enter": {
+              "x": {"scale": "timeScale", "field": "enter"},
+              "x2": {"scale": "timeScale", "field": "leave"},
+              "y": {"value": 16},
+              "height": {"value": 8},
+              "fill": {"value": "#ececec"},
+              "cornerRadius": {"value": 60}
+            }
+          }
+        },
+        {
+          "type": "rect",
+          "name": "selectionBar",
+          "encode": {
+            "enter": {
+              "x": {"value": 0},
+              "x2": {"value": 600},
+              "y": {"value": 16},
+              "height": {"value": 8},
+              "fill": {"value": "#0671ed"},
+              "cornerRadius": {"value": 60}
+            },
+            "update": {
+              "x": {"signal": "scale('timeScale', brush[0])"},
+              "x2": {"signal": "scale('timeScale', brush[1])"}
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "name": "coordinate1",
+          "encode": {
+            "enter": {
+              "x": {"value": 0},
+              "y": {"value": 20},
+              "size": {"value": 300},
+              "fill": {"value": "#0671ed"}
+            },
+            "update": {
+              "x": {"signal": "scale('timeScale', brush[0])"}
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "name": "coordinate2",
+          "encode": {
+            "enter": {
+              "x": {"value": 600},
+              "y": {"value": 20},
+              "size": {"value": 300},
+              "fill": {"value": "#0671ed"}
+            },
+            "update": {
+              "x": {"signal": "scale('timeScale', brush[1])"}
+            }
+          }
+        }
+      ]
   }
-  
+  ]
+}
