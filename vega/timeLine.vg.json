@@ -61,23 +61,26 @@
   "marks": [
     {
       "type": "rect",
+      "name": "invisibleRectangle",
       "from": {"data": "timeLine"},
       "encode": {
         "enter": {
           "x": {"scale": "timeScale", "field": "enter"},
           "x2": {"scale": "timeScale", "field": "leave"},
-          "y": {"value": 20},
-          "height": {"value": 3},
-          "fill": {"value": "#557"}
+          "y": {"value": 18},
+          "height": {"value": 4},
+          "fill": {"value": "#ececec"}
         }
       }
     },
     {
       "type": "symbol",
+      "name": "coordinate1",
       "encode": {
         "enter": {
           "x": {"value": 0},
-          "y": {"value": 20}
+          "y": {"value": 20},
+          "fill": {"value": "#0671ed"}
         },
         "update":{
           "x": {"signal": "scale('timeScale', brush[0])"}
@@ -86,13 +89,32 @@
     },
     {
       "type": "symbol",
+      "name": "coordinate2",
       "encode": {
         "enter": {
           "x": {"value": 600},
-          "y": {"value": 20}
+          "y": {"value": 20},
+          "fill": {"value": "#0671ed"}
         },
         "update":{
           "x": {"signal": "scale('timeScale', brush[1])"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "name": "selectionBar",
+      "encode": {
+        "enter":{
+          "x": {"value": 0},
+          "x2": {"value": 600},
+          "y": {"value": 18},
+          "height": {"value": 4},
+          "fill": {"value": "#0671ed"}
+        },
+        "update":{
+          "x": {"signal": "scale('timeScale', brush[0])"},
+          "x2": {"signal": "scale('timeScale', brush[1])"}
         }
       }
     },
