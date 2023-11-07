@@ -67,9 +67,28 @@
         "enter": {
           "x": {"scale": "timeScale", "field": "enter"},
           "x2": {"scale": "timeScale", "field": "leave"},
-          "y": {"value": 18},
-          "height": {"value": 4},
-          "fill": {"value": "#ececec"}
+          "y": {"value": 16},
+          "height": {"value": 8},
+          "fill": {"value": "#ececec"},
+          "cornerRadius": {"value": 60}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "name": "selectionBar",
+      "encode": {
+        "enter":{
+          "x": {"value": 0},
+          "x2": {"value": 600},
+          "y": {"value": 16},
+          "height": {"value": 8},
+          "fill": {"value": "#0671ed"},
+          "cornerRadius": {"value": 60}
+        },
+        "update":{
+          "x": {"signal": "scale('timeScale', brush[0])"},
+          "x2": {"signal": "scale('timeScale', brush[1])"}
         }
       }
     },
@@ -80,6 +99,7 @@
         "enter": {
           "x": {"value": 0},
           "y": {"value": 20},
+          "size": {"value": 300},
           "fill": {"value": "#0671ed"}
         },
         "update":{
@@ -94,27 +114,11 @@
         "enter": {
           "x": {"value": 600},
           "y": {"value": 20},
+          "size": {"value": 300},
           "fill": {"value": "#0671ed"}
         },
         "update":{
           "x": {"signal": "scale('timeScale', brush[1])"}
-        }
-      }
-    },
-    {
-      "type": "rect",
-      "name": "selectionBar",
-      "encode": {
-        "enter":{
-          "x": {"value": 0},
-          "x2": {"value": 600},
-          "y": {"value": 18},
-          "height": {"value": 4},
-          "fill": {"value": "#0671ed"}
-        },
-        "update":{
-          "x": {"signal": "scale('timeScale', brush[0])"},
-          "x2": {"signal": "scale('timeScale', brush[1])"}
         }
       }
     },
