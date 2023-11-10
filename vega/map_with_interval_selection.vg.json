@@ -15,6 +15,7 @@
     { "name": "timeLinelWidth", "value": 300 },
     { "name": "timeLineHeight", "value": 20 },
     { "name": "timeExtent", "value": [0, 600] },
+
     {
       "name": "brush", "update": "timeExtent",
       "on": [
@@ -131,7 +132,7 @@
   "data": [
     {
       "name": "world",
-      "url": "../data/world-110m.json",
+      "url": "https://raw.githubusercontent.com/vega/vega/main/packages/vega-loader/test/data/world-110m.json",
       "format": { "type": "topojson", "feature": "countries" },
       "transform": [
         {
@@ -146,7 +147,7 @@
     },
     {
       "name": "crashes",
-      "url": "../data/plane_crash_coordinatesV2.csv",
+      "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV2.csv",
       "format": {"type": "csv", "parse": "auto"},
       "transform": [
         {
