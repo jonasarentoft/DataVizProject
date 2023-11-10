@@ -122,20 +122,17 @@
         "name": "Select Manufacturer",
         "input": "select",
         "options": [
-          "All", "Other", "Curtiss", "Zeppelin", "deHavilland", "Farman", "Junkers",
-          "Breguet", "Handley Page", "Avro", "Bristol", "Missing value",
-          "Bleriot", "Liore et Olivier", "Fokker", "Sikorsky", "Douglas",
-          "Dornier", "Fairchild", "Latecoere", "Boeing", "Ford", "Vickers",
-          "Travel", "Stearman", "Lockheed", "Short", "Savoia Marchetti",
-          "Heinkel", "Stinson", "Dewoitine", "Consolidated", "Tupolev",
-          "Antonov", "Martin", "Curtiss Wright", "Grumman", "GAZ",
-          "Ilyushin", "Hawker Siddeley", "Convair", "Canadair", "Aero",
-          "Let", "Saab", "Beechcraft", "Nord", "Sud Aviation",
-          "McDonnell Douglas", "Avia", "Piper", "BAC", "Cessna", "Bell",
-          "Learjet", "Mil", "Fairchild Hiller", "Britten Norman", "Pilatus",
-          "Aerospatiale", "Gates", "NAMC", "Yakovlev", "Embraer", "IAI",
-          "GAF", "Airbus", "British", "CASA", "Swearingen", "Dassault",
-          "ATR", "Eurocopter", "Rockwell", "BAE"
+          "All", "Airbus", "Antonov", "ATR", "Aero", "Aerospatiale", "Avia", "Avro",
+           "BAE", "BAC", "Beechcraft", "Bell", "Bleriot", "Boeing", "Breguet", "Bristol", 
+           "British", "Britten Norman", "CASA", "Canadair", "Cessna", "Consolidated", 
+           "Convair", "Curtiss", "Curtiss Wright", "Dassault", "Dewoitine", "Douglas", 
+           "Dornier", "Embraer", "Eurocopter", "Fairchild", "Fairchild Hiller", "Fokker", 
+           "Ford", "GAZ", "GAF", "Gates", "Grumman", "Handley Page", "Hawker Siddeley", 
+           "Heinkel", "IAI", "Ilyushin", "Junkers", "Latecoere", "Learjet", "Let", 
+           "Liore et Olivier", "Lockheed", "McDonnell Douglas", "Martin", "Mil", 
+           "Missing value", "NAMC", "Nord", "Pilatus", "Piper", "Rockwell", "Saab", 
+           "Savoia Marchetti", "Short", "Sikorsky", "Stearman", "Stinson", "Sud Aviation", 
+           "Swearingen", "Travel", "Tupolev", "Vickers", "Yakovlev", "Zeppelin", "Other"
         ]
       }
     }
