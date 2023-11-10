@@ -10,13 +10,21 @@
       "name": "brush", "update": "timeExtent",
       "on": [
         {
-          "events":"mousedown",
-          "update": "[invert('timeScale', x()), invert('timeScale', x())]"
-        },
-        {
-          "events": "[mousedown, window:mouseup] > window:mousemove!",
+          "events": "[@invisibleRectangle:mousedown, window:mouseup] > window:mousemove!, [@selectionBar:mousedown, window:mouseup] > window:mousemove!",
           "update": 
           "[clamp(min(anchor, invert('timeScale', x())),0,width), clamp(max(anchor, invert('timeScale', x())),0,width)]"
+        },
+        {
+          "events": "[@coordinate1:mousedown, window:mouseup] > window:mousemove!",
+          "update": "[clamp(min(brush[1], invert('timeScale', x())),0,width), brush[1]]"
+        },
+        {
+          "events": "[@coordinate2:mousedown, window:mouseup] > window:mousemove!",
+          "update": "[brush[0], clamp(max(brush[0], invert('timeScale', x())),0,width)]"
+        },
+        {
+          "events": "@coordinate1:dblclick, @coordinate2:dblclick",
+          "update": "[timeExtent[0], timeExtent[1]]"
         }
       ]
     },
@@ -24,7 +32,7 @@
       "name": "anchor", "value": 0,
       "on": [
         {
-          "events": "mousedown!",
+          "events": "mousedown",
           "update": "invert('timeScale', x())"
         }
       ]
