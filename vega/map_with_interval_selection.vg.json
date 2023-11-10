@@ -12,36 +12,36 @@
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
-    { "name": "timeLinelWidth", "value": 300 },
-    { "name": "timeLineHeight", "value": 20 },
-    { "name": "timeExtent", "value": [0, 600] },
+    { "name": "fatalitySelectionWidth", "value": 300 },
+    { "name": "fatalitySelectionHeight", "value": 20 },
+    { "name": "fatalityExtent", "value": [0, 600] },
 
     {
-      "name": "brush", "update": "timeExtent",
+      "name": "fatalityBrush", "update": "fatalityExtent",
       "on": [
         {
-          "events": "[@selectionBar:mousedown, window:mouseup] > window:mousemove!, [@invisibleRectangle:mousedown, window:mouseup] > window:mousemove!",
+          "events": "[@fatalitySelectionBar:mousedown, window:mouseup] > window:mousemove!, [@fatalityBackgroundBar:mousedown, window:mouseup] > window:mousemove!",
           "update": 
-          "[clamp(min(anchor, invert('timeScale', x())),0,width), clamp(max(anchor, invert('timeScale', x())),0,width)]"
+          "[clamp(min(fatalityAnchor, invert('fatalityScale', x())),0,width), clamp(max(fatalityAnchor, invert('fatalityScale', x())),0,width)]"
         },
         {
           "events": "[@coordinate1:mousedown, window:mouseup] > window:mousemove!",
-          "update": "[clamp(min(brush[1], invert('timeScale', x())),0,width), brush[1]]"
+          "update": "[clamp(min(fatalityBrush[1], invert('fatalityScale', x())),0,width), fatalityBrush[1]]"
         },
         {
           "events": "[@coordinate2:mousedown, window:mouseup] > window:mousemove!",
-          "update": "[brush[0], clamp(max(brush[0], invert('timeScale', x())),0,width)]"
+          "update": "[fatalityBrush[0], clamp(max(fatalityBrush[0], invert('fatalityScale', x())),0,width)]"
         },
         {
           "events": "@coordinate1:dblclick, @coordinate2:dblclick",
-          "update": "[timeExtent[0], timeExtent[1]]"
+          "update": "[fatalityExtent[0], fatalityExtent[1]]"
         }
       ]
     },
     {
-      "name": "anchor", "value": 0,
+      "name": "fatalityAnchor", "value": 0,
       "on": [
-        {"events": "@selectionBar:mousedown!, @invisibleRectangle:mousedown!", "update": "invert('timeScale', x())"}
+        {"events": "@fatalitySelectionBar:mousedown!, @fatalityBackgroundBar:mousedown!", "update": "invert('fatalityScale', x())"}
       ]
     },
     {
@@ -163,8 +163,8 @@
           "projection": "projection",
           "fields": ["Longitude", "Latitude"]
         },
-        {"type": "filter", "expr": "datum.Fatalities <= brush[1]"},
-        {"type": "filter", "expr": "datum.Fatalities >= brush[0]"},
+        {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
+        {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
         {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"}
         ]
     }
@@ -177,10 +177,10 @@
       "range": [16, 1000]
     },
     {
-      "name": "timeScale",
+      "name": "fatalityScale",
       "type": "linear",
       "round": true,
-      "domain": [0, {"signal": "timeLinelWidth*4"}],
+      "domain": [0, {"signal": "fatalitySelectionWidth*4"}],
       "range": "width"
     }
   ],
@@ -262,17 +262,17 @@
     {
       "type": "group",
       "signals": [
-        { "name": "width", "update": "timeLinelWidth" },
-        { "name": "height", "update": "timeLineHeight" }
+        { "name": "width", "update": "fatalitySelectionWidth" },
+        { "name": "height", "update": "fatalitySelectionHeight" }
       ],
       "encode": {
         "update": {
-          "width": { "signal": "timeLinelWidth" },
-          "height": { "signal": "timeLineHeight" }
+          "width": { "signal": "fatalitySelectionWidth" },
+          "height": { "signal": "fatalitySelectionHeight" }
         }
       },
       "axes": [
-        { "orient": "bottom", "scale": "timeScale", "format": "d" }
+        { "orient": "bottom", "scale": "fatalityScale", "format": "d" }
       ],
       "data": [
             {
@@ -288,7 +288,7 @@
       ],
       "scales": [
             {
-              "name": "timeScale",
+              "name": "fatalityScale",
               "type": "linear",
               "round": true,
               "domain": [0, 600],
@@ -298,12 +298,12 @@
       "marks": [
         {
           "type": "rect",
-          "name": "invisibleRectangle",
+          "name": "fatalityBackgroundBar",
           "from": {"data": "timeLine"},
           "encode": {
             "enter": {
-              "x": {"scale": "timeScale", "field": "enter"},
-              "x2": {"scale": "timeScale", "field": "leave"},
+              "x": {"scale": "fatalityScale", "field": "enter"},
+              "x2": {"scale": "fatalityScale", "field": "leave"},
               "y": {"value": 16},
               "height": {"value": 8},
               "fill": {"value": "#ececec"},
@@ -313,7 +313,7 @@
         },
         {
           "type": "rect",
-          "name": "selectionBar",
+          "name": "fatalitySelectionBar",
           "encode": {
             "enter": {
               "x": {"value": 0},
@@ -324,8 +324,8 @@
               "cornerRadius": {"value": 60}
             },
             "update": {
-              "x": {"signal": "scale('timeScale', brush[0])"},
-              "x2": {"signal": "scale('timeScale', brush[1])"}
+              "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"},
+              "x2": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
             }
           }
         },
@@ -340,7 +340,7 @@
               "fill": {"value": "#0671ed"}
             },
             "update": {
-              "x": {"signal": "scale('timeScale', brush[0])"}
+              "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"}
             }
           }
         },
@@ -355,7 +355,7 @@
               "fill": {"value": "#0671ed"}
             },
             "update": {
-              "x": {"signal": "scale('timeScale', brush[1])"}
+              "x": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
             }
           }
         }
