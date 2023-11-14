@@ -4,11 +4,7 @@
   "width": 600,
   "height": 400,
   "autosize": "pad",
-  "layout": {
-    "padding": 0,
-    "columns": 1,
-    "align": "each"
-  },
+  "layout": {"padding": 0, "columns": 1, "align": "each"},
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
@@ -24,8 +20,8 @@
     {"name": "yearMax", "value": 2023},
     { "name": "yearExtent", "init": "[yearMin, yearMax]"},
 
-    {
-      "name": "fatalityBrush", "update": "fatalityExtent",
+    {"name": "fatalityBrush", 
+    "update": "fatalityExtent",
       "on": [
         {
           "events": "[@fatalitySelection:mousedown, window:mouseup] > window:mousemove!, [@fatalityBackground:mousedown, window:mouseup] > window:mousemove!",
@@ -46,45 +42,68 @@
         }
       ]
     },
-    {
-      "name": "fatalityAnchor", "value": 0,
+    {"name": "yearBrush",
+    "update": "yearExtent",
+    "on": [
+      {
+        "events": "[@yearSelection:mousedown, window:mouseup] > window:mousemove!, [@yearBackground:mousedown, window:mouseup] > window:mousemove!",
+        "update": 
+        "[clamp(min(yearAnchor, invert('yearScale', x())),yearMin,yearMax), clamp(max(yearAnchor, invert('yearScale', x())),yearMin,yearMax)]"
+      },
+      {
+        "events": "[@yearX1:mousedown, window:mouseup] > window:mousemove!",
+        "update": "[clamp(min(yearBrush[1], invert('yearScale', x())),yearMin,yearMax), yearBrush[1]]"
+      },
+      {
+        "events": "[@yearX2:mousedown, window:mouseup] > window:mousemove!",
+        "update": "[yearBrush[0], clamp(max(yearBrush[0], invert('yearScale', x())),yearMin,yearMax)]"
+      },
+      {
+        "events": "@yearX1:dblclick, @yearX2:dblclick",
+        "update": "[yearExtent[0], yearExtent[1]]"
+      }
+    ]
+    },
+    {"name": "fatalityAnchor", 
+    "value": 0,
       "on": [
         {"events": "@fatalitySelection:mousedown!, @fatalityBackground:mousedown!", "update": "invert('fatalityScale', x())"}
       ]
     },
-    {
-      "name": "scale",
+    {"name": "yearAnchor", 
+    "value": 1909,
+      "on": [
+        {"events": "@yearSelection:mousedown!, @yearBackground:mousedown!", "update": "invert('yearScale', x())"}
+      ]
+    },
+    {"name": "scroll",
       "value": 150,
       "on": [
         {
-          "events": "@land:wheel!, @water:wheel!",
-          "update": "clamp(scale * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+          "events": "@land:wheel!, @water:wheel!, @point:wheel!",
+          "update": "clamp(scroll * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
         }
       ]
     },
-    {
-      "name": "angles",
+    {"name": "angles",
       "value": [0, 0],
       "on": [
         {"events": "@land:mousedown, @water:mousedown", "update": "[rotateX, centerY]"}
       ]
     },
-    {
-      "name": "cloned",
+    {"name": "cloned",
       "value": null,
       "on": [
         {"events": "@land:mousedown, @water:mousedown", "update": "copy('projection')"}
       ]
     },
-    {
-      "name": "start",
+    {"name": "start",
       "value": null,
       "on": [
         {"events": "@land:mousedown, @water:mousedown", "update": "invert(cloned, xy())"}
       ]
     },
-    {
-      "name": "drag",
+    {"name": "drag",
       "value": null,
       "on": [
         {
@@ -93,8 +112,7 @@
         }
       ]
     },
-    {
-      "name": "delta",
+    {"name": "delta",
       "value": null,
       "on": [
         {
@@ -103,8 +121,7 @@
         }
       ]
     },
-    {
-      "name": "rotateX",
+    {"name": "rotateX",
       "value": 0,
       "on": [
         {
@@ -113,8 +130,7 @@
         }
       ]
     },
-    {
-      "name": "centerY",
+    {"name": "centerY",
       "value": 0,
       "on": [
         {
@@ -123,8 +139,7 @@
         }
       ]
     },
-    {
-      "name": "selectManufacturer",
+    {"name": "selectManufacturer",
       "value": "All",
       "bind": {
         "name": "Select Manufacturer",
@@ -146,8 +161,7 @@
     }
   ],
   "data": [
-    {
-      "name": "world",
+    {"name": "world",
       "url": "https://raw.githubusercontent.com/vega/vega/main/packages/vega-loader/test/data/world-110m.json",
       "format": { "type": "topojson", "feature": "countries" },
       "transform": [
@@ -157,12 +171,10 @@
         }
       ]
     },
-    {
-      "name": "sphere",
+    {"name": "sphere",
       "values": [{"type": "Sphere"}]
     },
-    {
-      "name": "crashes",
+    {"name": "crashes",
       "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV2.csv",
       "format": {"type": "csv", "parse": "auto"},
       "transform": [
@@ -173,39 +185,43 @@
         },
         {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
         {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
-        {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"}
+        {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"},
+        {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
+        {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
         ]
     }
   ],
   "scales": [
-    {
-      "name": "fatalitySize",
+    {"name": "fatalitySize",
       "type": "linear",
       "domain": [0, 583],
       "range": [16, 1000]
     },
-    {
-      "name": "fatalityScale",
+    {"name": "fatalityScale",
       "type": "linear",
       "round": true,
       "range": [0, {"signal": "selectionWidth"}],
       "domain": {"signal": "fatalityExtent"}
-      
+    },
+    {"name": "yearScale",
+    "type": "linear",
+    "round": true,
+    "zero": false,
+    "range": [0, {"signal": "selectionWidth"}],
+    "domain": {"signal": "yearExtent"}
     }
   ],
   "projections": [
-    {
-      "name": "projection",
+    {"name": "projection",
       "type": "mercator",
-      "scale": { "signal": "scale" },
+      "scale": { "signal": "scroll" },
       "rotate": [{ "signal": "rotateX" }, 0, 0],
       "center": [0, { "signal": "centerY" }],
       "translate": [{ "signal": "width / 2" }, { "signal": "height / 2" }]
     }
   ],
   "marks": [
-    {
-      "name": "interactiveMap",
+    {"name": "interactiveMap",
       "type": "group",
       "encode": {
         "enter": {
@@ -243,6 +259,7 @@
           }
         },
         {
+          "name": "point",
           "type": "symbol",
           "from": {"data": "crashes"},
           "sort": {"field": "datum.Fatalities", "order":"descending"},
@@ -254,7 +271,7 @@
               "fillOpacity": {"value": 0.8},
               "stroke": {"value": "white"},
               "strokeWidth": {"value": 1.5},
-              "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities,'Observation': datum.X}"}
+              "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities,'Observation': datum.X, 'Year': datum.Year}"}
             },
             "update": {
               "x": {"field": "x"},
@@ -268,8 +285,7 @@
         }
       ]
     },
-    {
-      "name": "selectionBarFatalities",
+    {"name": "selectionBarFatalities",
       "type": "group",
       "signals": [
         { "name": "width", "update": "selectionWidth" },
@@ -349,13 +365,85 @@
         }
       ]
     },
-    {
-      "name": "selectionBarYear",
+    {"name": "selectionBarYear",
       "type": "group",
-      "signals": [],
-      "encode": {},
-      "axes": [],
-      "marks": []
+      "signals": [
+        { "name": "width", "update": "selectionWidth" },
+        { "name": "height", "update": "selectionHeight" }
+      ],
+      "encode": {
+        "update": {
+          "width": { "signal": "selectionWidth" },
+          "height": { "signal": "selectionHeight" }
+        }
+      },
+      "axes": [
+        {"orient": "bottom", "scale": "yearScale", "format": "d", "tickCount": 15}
+      ],
+      "marks": [
+        {
+          "type": "rect",
+          "name": "yearBackground",
+          "encode": {
+            "enter": {
+              "x": {"scale": "yearScale", "signal": "yearMin"},
+              "x2": {"scale": "yearScale", "signal": "yearMax"},
+              "y": {"value": 16},
+              "height": {"value": 8},
+              "fill": {"value": "#ececec"},
+              "cornerRadius": {"value": 60}
+            }
+          }
+        },
+        {
+          "type": "rect",
+          "name": "yearSelection",
+          "encode": {
+            "enter": {
+              "x": {"scale": "yearScale", "signal": "yearMin"},
+              "x2": {"scale": "yearScale", "signal": "yearMax"},
+              "y": {"value": 16},
+              "height": {"value": 8},
+              "fill": {"value": "#0671ed"},
+              "cornerRadius": {"value": 60}
+            },
+            "update": {
+              "x": {"signal": "scale('yearScale', yearBrush[0])"},
+              "x2": {"signal": "scale('yearScale', yearBrush[1])"}
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "name": "yearX1",
+          "encode": {
+            "enter": {
+              "x": {"scale": "yearScale", "signal": "yearMin"},
+              "y": {"value": 20},
+              "size": {"value": 300},
+              "fill": {"value": "#0671ed"}
+            },
+            "update": {
+              "x": {"signal": "scale('yearScale', yearBrush[0])"}
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "name": "yearX2",
+          "encode": {
+            "enter": {
+              "x": {"scale": "yearScale", "signal": "yearMax"},
+              "y": {"value": 20},
+              "size": {"value": 300},
+              "fill": {"value": "#0671ed"}
+            },
+            "update": {
+              "x": {"signal": "scale('yearScale', yearBrush[1])"}
+            }
+          }
+        }
+      ]
     }
   ]
 }
