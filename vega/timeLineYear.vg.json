@@ -1,0 +1,159 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "description": "A timeline visualization with a custom year.",
+    "width": 600,
+    "height": 20,
+    "padding": 5,
+
+    "signals": [
+        {"name": "yearMin", "value": 1908},
+        {"name": "yearMax", "value": 2023},
+        { "name": "yearExtent", "init": "[yearMin, yearMax]"},
+        {
+          "name": "yearBrush", "update": "yearExtent",
+          "on": [
+            {
+              "events": "[@yearBackground:mousedown, window:mouseup] > window:mousemove!, [@yearSelection:mousedown, window:mouseup] > window:mousemove!",
+              "update": 
+              "[clamp(min(yearAnchor, invert('yearScale', x())),yearMin,2023), clamp(max(yearAnchor, invert('yearScale', x())),yearMin,yearMax)]"
+            },
+            {
+              "events": "[@yearX1:mousedown, window:mouseup] > window:mousemove!",
+              "update": "[clamp(min(yearBrush[1], invert('yearScale', x())),yearMin,yearMax), yearBrush[1]]"
+            },
+            {
+              "events": "[@yearX2:mousedown, window:mouseup] > window:mousemove!",
+              "update": "[yearBrush[0], clamp(max(yearBrush[0], invert('yearScale', x())),yearMin,yearMax)]"
+            },
+            {
+              "events": "@yearX1:dblclick, @yearX2:dblclick",
+              "update": "[yearExtent[0], yearExtent[1]]"
+            }
+          ] 
+        },
+        {
+          "name": "yearAnchor", "value": 0,
+          "on": [
+            {
+              "events": "mousedown",
+              "update": "invert('yearScale', x())"
+            }
+          ]
+        }
+    ],
+
+    "data": [
+      {
+        "name": "table",
+        "values": [
+          {"year": 1908},
+          {"year": 2023}
+        ],
+        "transform": [
+          {
+            "type": "extent",
+            "field": "year",
+            "signal": "years"
+          }
+        ]
+      }
+    ],
+  
+    "scales": [
+      {
+        "name": "yearScale",
+        "type": "linear",
+        "range": "width",
+        "zero": false,
+        "domain": {"data": "table", "field": "year"}
+      }
+    ],
+  
+    "axes": [
+      {
+        "orient": "bottom",
+        "scale": "yearScale",
+        "format": "d",
+        "tickCount": 30
+      }
+    ],
+
+    "marks": [
+      {
+        "type": "rect",
+        "name": "yearBackground",
+        "encode": {
+          "enter": {
+            "x": {"scale": "yearScale", "signal": "yearMin"},
+            "x2": {"scale": "yearScale", "signal": "yearMax"},
+            "y": {"value": 16},
+            "height": {"value": 8},
+            "fill": {"value": "#ececec"},
+            "cornerRadius": {"value": 60}
+          }
+        }
+      },
+      {
+        "type": "rect",
+        "name": "yearSelection",
+        "encode": {
+          "enter":{
+            "x": {"scale": "yearScale", "signal": "yearMin"},
+            "x2": {"scale": "yearScale", "signal": "yearMax"},
+            "y": {"value": 16},
+            "height": {"value": 8},
+            "fill": {"value": "#0671ed"},
+            "cornerRadius": {"value": 60}
+          },
+          "update":{
+            "x": {"signal": "scale('yearScale', yearBrush[0])"},
+            "x2": {"signal": "scale('yearScale', yearBrush[1])"}
+          }
+        }
+      },
+      {
+        "type": "symbol",
+        "name": "yearX1",
+        "encode": {
+          "enter": {
+            "x": {"signal": "yearMin"},
+            "y": {"value": 20},
+            "size": {"value": 300},
+            "fill": {"value": "#0671ed"}
+          },
+          "update":{
+            "x": {"signal": "scale('yearScale', yearBrush[0])"}
+          }
+        }
+      },
+      {
+        "type": "symbol",
+        "name": "yearX2",
+        "encode": {
+          "enter": {
+            "x": {"signal": "yearMax"},
+            "y": {"value": 20},
+            "size": {"value": 300},
+            "fill": {"value": "#0671ed"}
+          },
+          "update":{
+            "x": {"signal": "scale('yearScale', yearBrush[1])"}
+          }
+        }
+      },
+      {
+        "type": "text",
+        "encode": {
+          "update": {
+            "x": {"value": 300},
+            "y": {"value": 0},
+            "fill": {"value": "black"},
+            "fontSize": {"value": 10},
+            "align": {"value": "right"},
+            "text": {"signal": "yearBrush"}
+          }
+        }
+      }
+    ]
+  }
+  
