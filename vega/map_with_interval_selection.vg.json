@@ -12,28 +12,36 @@
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
-    { "name": "fatalitySelectionWidth", "value": 300 },
-    { "name": "fatalitySelectionHeight", "value": 20 },
-    { "name": "fatalityExtent", "value": [0, 600] },
+    { "name": "selectionWidth", "value": 300 },
+    { "name": "selectionHeight", "value": 20 },
+
+
+    {"name": "fatalityMin", "value": 0},
+    {"name": "fatalityMax", "value": 600},
+    { "name": "fatalityExtent", "init": "[fatalityMin, fatalityMax]" },
+
+    {"name": "yearMin", "value": 1908},
+    {"name": "yearMax", "value": 2023},
+    { "name": "yearExtent", "init": "[yearMin, yearMax]"},
 
     {
       "name": "fatalityBrush", "update": "fatalityExtent",
       "on": [
         {
-          "events": "[@fatalitySelectionBar:mousedown, window:mouseup] > window:mousemove!, [@fatalityBackgroundBar:mousedown, window:mouseup] > window:mousemove!",
+          "events": "[@fatalitySelection:mousedown, window:mouseup] > window:mousemove!, [@fatalityBackground:mousedown, window:mouseup] > window:mousemove!",
           "update": 
           "[clamp(min(fatalityAnchor, invert('fatalityScale', x())),0,width), clamp(max(fatalityAnchor, invert('fatalityScale', x())),0,width)]"
         },
         {
-          "events": "[@coordinate1:mousedown, window:mouseup] > window:mousemove!",
+          "events": "[@fatalityX1:mousedown, window:mouseup] > window:mousemove!",
           "update": "[clamp(min(fatalityBrush[1], invert('fatalityScale', x())),0,width), fatalityBrush[1]]"
         },
         {
-          "events": "[@coordinate2:mousedown, window:mouseup] > window:mousemove!",
+          "events": "[@fatalityX2:mousedown, window:mouseup] > window:mousemove!",
           "update": "[fatalityBrush[0], clamp(max(fatalityBrush[0], invert('fatalityScale', x())),0,width)]"
         },
         {
-          "events": "@coordinate1:dblclick, @coordinate2:dblclick",
+          "events": "@fatalityX1:dblclick, @fatalityX2:dblclick",
           "update": "[fatalityExtent[0], fatalityExtent[1]]"
         }
       ]
@@ -41,7 +49,7 @@
     {
       "name": "fatalityAnchor", "value": 0,
       "on": [
-        {"events": "@fatalitySelectionBar:mousedown!, @fatalityBackgroundBar:mousedown!", "update": "invert('fatalityScale', x())"}
+        {"events": "@fatalitySelection:mousedown!, @fatalityBackground:mousedown!", "update": "invert('fatalityScale', x())"}
       ]
     },
     {
@@ -171,7 +179,7 @@
   ],
   "scales": [
     {
-      "name": "size",
+      "name": "fatalitySize",
       "type": "linear",
       "domain": [0, 583],
       "range": [16, 1000]
@@ -180,8 +188,9 @@
       "name": "fatalityScale",
       "type": "linear",
       "round": true,
-      "domain": [0, {"signal": "fatalitySelectionWidth*4"}],
-      "range": "width"
+      "range": [0, {"signal": "selectionWidth"}],
+      "domain": {"signal": "fatalityExtent"}
+      
     }
   ],
   "projections": [
@@ -239,7 +248,7 @@
           "sort": {"field": "datum.Fatalities", "order":"descending"},
           "encode": {
             "enter": {
-              "size": {"scale": "size", "field": "Fatalities"}, 
+              "size": {"scale": "fatalitySize", "field": "Fatalities"}, 
               "shape": {"value": "circle"},
               "fill": {"value": "steelblue"},
               "fillOpacity": {"value": 0.8},
@@ -260,50 +269,29 @@
       ]
     },
     {
+      "name": "selectionBarFatalities",
       "type": "group",
       "signals": [
-        { "name": "width", "update": "fatalitySelectionWidth" },
-        { "name": "height", "update": "fatalitySelectionHeight" }
+        { "name": "width", "update": "selectionWidth" },
+        { "name": "height", "update": "selectionHeight" }
       ],
       "encode": {
         "update": {
-          "width": { "signal": "fatalitySelectionWidth" },
-          "height": { "signal": "fatalitySelectionHeight" }
+          "width": { "signal": "selectionWidth" },
+          "height": { "signal": "selectionHeight" }
         }
       },
       "axes": [
         { "orient": "bottom", "scale": "fatalityScale", "format": "d" }
       ],
-      "data": [
-            {
-              "name": "timeLine",
-              "values": [
-                {
-                  "label": "interval",
-                  "enter": 0,
-                  "leave": 600
-                }
-              ]
-            }
-      ],
-      "scales": [
-            {
-              "name": "fatalityScale",
-              "type": "linear",
-              "round": true,
-              "domain": [0, 600],
-              "range": "width"
-    }
-      ],
       "marks": [
         {
           "type": "rect",
-          "name": "fatalityBackgroundBar",
-          "from": {"data": "timeLine"},
+          "name": "fatalityBackground",
           "encode": {
             "enter": {
-              "x": {"scale": "fatalityScale", "field": "enter"},
-              "x2": {"scale": "fatalityScale", "field": "leave"},
+              "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+              "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
               "y": {"value": 16},
               "height": {"value": 8},
               "fill": {"value": "#ececec"},
@@ -313,11 +301,11 @@
         },
         {
           "type": "rect",
-          "name": "fatalitySelectionBar",
+          "name": "fatalitySelection",
           "encode": {
             "enter": {
-              "x": {"value": 0},
-              "x2": {"value": 600},
+              "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+              "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
               "y": {"value": 16},
               "height": {"value": 8},
               "fill": {"value": "#0671ed"},
@@ -331,10 +319,10 @@
         },
         {
           "type": "symbol",
-          "name": "coordinate1",
+          "name": "fatalityX1",
           "encode": {
             "enter": {
-              "x": {"value": 0},
+              "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
               "y": {"value": 20},
               "size": {"value": 300},
               "fill": {"value": "#0671ed"}
@@ -346,10 +334,10 @@
         },
         {
           "type": "symbol",
-          "name": "coordinate2",
+          "name": "fatalityX2",
           "encode": {
             "enter": {
-              "x": {"value": 600},
+              "x": {"scale": "fatalityScale", "signal": "fatalityMax"},
               "y": {"value": 20},
               "size": {"value": 300},
               "fill": {"value": "#0671ed"}
@@ -360,6 +348,14 @@
           }
         }
       ]
-  }
+    },
+    {
+      "name": "selectionBarYear",
+      "type": "group",
+      "signals": [],
+      "encode": {},
+      "axes": [],
+      "marks": []
+    }
   ]
 }
