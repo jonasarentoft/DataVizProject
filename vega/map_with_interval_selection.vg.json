@@ -107,7 +107,7 @@
       "value": null,
       "on": [
         {
-          "events": "[@land:mousedown, window:mouseup] > window:mousemove, [@water:mousedown, window:mouseup] > window:mousemove",
+          "events": "[@land:mousedown[!event.shiftKey], window:mouseup] > window:mousemove, [@water:mousedown[!event.shiftKey], window:mouseup] > window:mousemove",
           "update": "invert(cloned, xy())"
         }
       ]
@@ -271,7 +271,7 @@
               "fillOpacity": {"value": 0.8},
               "stroke": {"value": "white"},
               "strokeWidth": {"value": 1.5},
-              "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities,'Observation': datum.X, 'Year': datum.Year}"}
+              "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities, 'Year': datum.Year, 'Summary': datum.Summary}"}
             },
             "update": {
               "x": {"field": "x"},
