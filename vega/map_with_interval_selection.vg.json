@@ -64,6 +64,36 @@
       }
     ]
     },
+    {"name": "brushX", 
+    "value": 0,
+    "on": [
+      {
+        "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
+        "update": "[x(), x()]"
+      },
+      {
+        "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+        "update": "[brushX[0], clamp(x(), 0, width)]"
+      },
+      {
+        "events": [{"signal": "scroll"}, {"signal": "drag"}],
+        "update": "[0,0]"
+      }
+    ]
+    },
+    {"name": "brushY",
+      "value": 0,
+      "on": [
+        {
+          "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
+          "update": "[y(), y()]"
+        },
+        {
+          "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+          "update": "[brushY[0], clamp(y(), 0, height)]"
+        }
+      ]
+    },
     {"name": "fatalityAnchor", 
     "value": 0,
       "on": [
@@ -284,6 +314,21 @@
           }
         }
       ]
+    },
+    {"name": "brush",
+      "type": "rect",
+      "encode": {
+        "enter": {
+          "fill": {"value": "#eee"}
+        },
+        "update": {
+          "opacity": {"value": 0.4},
+          "x": {"signal": "brushX[0]"},
+          "x2": {"signal": "brushX[1]"},
+          "y": {"signal": "brushY[0]"},
+          "y2": {"signal": "brushY[1]"}
+        }
+      }
     },
     {"name": "selectionBarFatalities",
       "type": "group",
