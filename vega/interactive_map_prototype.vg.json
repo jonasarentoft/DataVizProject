@@ -1,15 +1,13 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "padding": 5,
-  "width": 1000,
-  "height": 500,
+  "width": 600,
+  "height": 400,
   "autosize": "pad",
   "layout": {"padding":5, "rows": 3, "columns": 2, "align": "each"},
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
-    { "name": "histogramWidth", "value": 600},
-    { "name": "histogramHeight", "value": 400 },
     { "name": "selectionWidth", "value": 300 },
     { "name": "selectionHeight", "value": 20 },
 
@@ -238,7 +236,19 @@
         {"type": "filter", "expr": "datum.x >= brushX[0] && datum.x <= brushX[1]"},
         {"type": "filter", "expr": "datum.y >= brushY[0] && datum.y <= brushY[1]"}
       ]
-    }
+    },
+    {
+      "name": "aggregatedBrushedCrashes",
+      "source": "brushedCrashes",
+      "transform": [
+        {
+        "type": "aggregate",
+        "groupby": ["Manufacturer"],
+        },
+        {"type": "collect", "sort": {"field": "count"}}
+      ]
+    },
+
   ],
   "scales": [
     {"name": "fatalitySize",
@@ -260,21 +270,20 @@
     "domain": {"signal": "yearExtent"}
     },
     {
-      "name": "xscale",
+      "name": "yscale",
       "type": "band",
-      "domain": {"data": "brushedCrashes", "field": "Manufacturer"},
-      "range" : [0, {"signal" : "histogramWidth"}],
-      // "range" : "width",
-      // "range": {"signal" : "histogramWidth"},
+      "domain": {"data": "aggregatedBrushedCrashes", "field": "Manufacturer"},
+      "range": "height",
       "padding": 0.05,
       "round": true
     },
     {
-      "name": "yscale",
-      "domain": {"data": "brushedCrashes", "field": "Fatalities"},
+      "name": "xscale",
+      "domain": {"data": "aggregatedBrushedCrashes", "field": "count"},
       "nice": true,
-      // "range": {"signal" : "histogramHeight"}
-      "range" : [0, {"signal" : "histogramHeight"}]
+      "range": "width",
+      "padding": 0.05,
+      "round": true
     }
   ],
   "projections": [
@@ -369,19 +378,21 @@
     {"name": "histogram",
       "type": "group",
       "axes": [
-        { "orient": "top", "scale": "xscale" },
+        { "orient": "bottom", "scale": "xscale" },
         { "orient": "left", "scale": "yscale" }
+
         ],
       "marks": [
             {
               "type": "rect",
-              "from": {"data":"brushedCrashes"},
+              "from": {"data":"aggregatedBrushedCrashes"},
               "encode": {
                 "enter": {
-                  "x": {"scale": "xscale", "field": "Manufacturer"},
-                  "width": {"scale": "xscale", "band": 0.2},
-                  "y": {"scale": "yscale", "field": "Fatalities"},
-                  "y2": {"scale": "yscale", "value": 0}
+                  "y": {"scale": "yscale", "field": "Manufacturer"},
+                 "height": {"scale": "yscale", "band": 0.5},
+                  "width": {"scale": "yscale", "band": 0.5},
+                  "x": {"scale": "xscale", "field": "count"},
+                  "x2": {"scale": "xscale", "value": 0}
                 },
                 "update": {
                   "fill": {"value": "steelblue"}
@@ -401,10 +412,10 @@
                 },
                 "update": {
                   "x": {"scale": "xscale", "signal": "tooltip.Manufacturer", "band": 0.5},
-                  "y": {"scale": "yscale", "signal": "tooltip.Fatalities", "offset": -2},
-                  "text": {"signal": "tooltip.Fatalities"},
+                  "y": {"scale": "yscale", "signal": "tooltip.count", "offset": -2},
+                  "text": {"signal": "tooltip.count"},
                   "fillOpacity": [
-                    {"test": "isNaN(tooltip.Fatalities)", "value": 0},
+                    {"test": "isNaN(tooltip.count)", "value": 0},
                     {"value": 1}
                   ]
                 }
