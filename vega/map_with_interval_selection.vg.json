@@ -219,7 +219,24 @@
         {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
         {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
         ]
-    }
+    },
+    {"name": "brushedCrashes",
+    "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV2.csv",
+    "format": {"type": "csv", "parse": "auto"},
+    "transform": [
+      {
+        "type": "geopoint",
+        "projection": "projection",
+        "fields": ["Longitude", "Latitude"]
+      },
+      {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
+      {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
+      {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"},
+      {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
+      {"type": "filter", "expr": "datum.x >= brushX[0] && datum.x <= brushX[1]"},
+      {"type": "filter", "expr": "datum.y >= brushY[0] && datum.y <= brushY[1]"}      
+      ]
+  }
   ],
   "scales": [
     {"name": "fatalitySize",

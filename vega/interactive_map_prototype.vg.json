@@ -1,15 +1,26 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "padding": 5,
-  "width": 600,
-  "height": 400,
+  "width": 1000,
+  "height": 500,
   "autosize": "pad",
-  "layout": {"padding": 0, "columns": 1, "align": "each"},
+  "layout": {"padding":5, "rows": 3, "columns": 2, "align": "each"},
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
+    { "name": "histogramWidth", "value": 600},
+    { "name": "histogramHeight", "value": 400 },
     { "name": "selectionWidth", "value": 300 },
     { "name": "selectionHeight", "value": 20 },
+
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    },
 
 
     {"name": "fatalityMin", "value": 0},
@@ -65,7 +76,7 @@
     ]
     },
     {"name": "brushX", 
-    "value": 0,
+    "init": "[0, 200]",
     "on": [
       {
         "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -82,7 +93,7 @@
     ]
     },
     {"name": "brushY",
-      "value": 0,
+      "init": "[0, mapHeight]",
       "on": [
         {
           "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -247,6 +258,23 @@
     "zero": false,
     "range": [0, {"signal": "selectionWidth"}],
     "domain": {"signal": "yearExtent"}
+    },
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "brushedCrashes", "field": "Manufacturer"},
+      "range" : [0, {"signal" : "histogramWidth"}],
+      // "range" : "width",
+      // "range": {"signal" : "histogramWidth"},
+      "padding": 0.05,
+      "round": true
+    },
+    {
+      "name": "yscale",
+      "domain": {"data": "brushedCrashes", "field": "Fatalities"},
+      "nice": true,
+      // "range": {"signal" : "histogramHeight"}
+      "range" : [0, {"signal" : "histogramHeight"}]
     }
   ],
   "projections": [
@@ -338,6 +366,52 @@
         }
       }
     },
+    {"name": "histogram",
+      "type": "group",
+      "axes": [
+        { "orient": "top", "scale": "xscale" },
+        { "orient": "left", "scale": "yscale" }
+        ],
+      "marks": [
+            {
+              "type": "rect",
+              "from": {"data":"brushedCrashes"},
+              "encode": {
+                "enter": {
+                  "x": {"scale": "xscale", "field": "Manufacturer"},
+                  "width": {"scale": "xscale", "band": 0.2},
+                  "y": {"scale": "yscale", "field": "Fatalities"},
+                  "y2": {"scale": "yscale", "value": 0}
+                },
+                "update": {
+                  "fill": {"value": "steelblue"}
+                },
+                "hover": {
+                  "fill": {"value": "red"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "encode": {
+                "enter": {
+                  "align": {"value": "center"},
+                  "baseline": {"value": "bottom"},
+                  "fill": {"value": "#333"}
+                },
+                "update": {
+                  "x": {"scale": "xscale", "signal": "tooltip.Manufacturer", "band": 0.5},
+                  "y": {"scale": "yscale", "signal": "tooltip.Fatalities", "offset": -2},
+                  "text": {"signal": "tooltip.Fatalities"},
+                  "fillOpacity": [
+                    {"test": "isNaN(tooltip.Fatalities)", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+      ]
+    },
     {"name": "selectionBarFatalities",
       "type": "group",
       "signals": [
@@ -418,6 +492,8 @@
         }
       ]
     },
+    {"name": "paddingOfGridLayout",
+      "type": "group"},
     {"name": "selectionBarYear",
       "type": "group",
       "signals": [

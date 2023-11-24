@@ -1,0 +1,585 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "padding": 5,
+    "width": 600,
+    "height": 400,
+    "autosize": "pad",
+    "layout": {"padding":5, "rows": 3, "columns": 2, "align": "each"},
+    "signals": [
+      { "name": "mapWidth", "value": 600 },
+      { "name": "mapHeight", "value": 400 },
+      { "name": "selectionWidth", "value": 300 },
+      { "name": "selectionHeight", "value": 20 },
+  
+      {
+        "name": "tooltip",
+        "value": {},
+        "on": [
+          {"events": "rect:mouseover", "update": "datum"},
+          {"events": "rect:mouseout",  "update": "{}"}
+        ]
+      },
+  
+  
+      {"name": "fatalityMin", "value": 0},
+      {"name": "fatalityMax", "value": 600},
+      { "name": "fatalityExtent", "init": "[fatalityMin, fatalityMax]" },
+  
+      {"name": "yearMin", "value": 1908},
+      {"name": "yearMax", "value": 2023},
+      { "name": "yearExtent", "init": "[yearMin, yearMax]"},
+  
+      {"name": "fatalityBrush", 
+      "update": "fatalityExtent",
+        "on": [
+          {
+            "events": "[@fatalitySelection:mousedown, window:mouseup] > window:mousemove!, [@fatalityBackground:mousedown, window:mouseup] > window:mousemove!",
+            "update": 
+            "[clamp(min(fatalityAnchor, invert('fatalityScale', x())),0,width), clamp(max(fatalityAnchor, invert('fatalityScale', x())),0,width)]"
+          },
+          {
+            "events": "[@fatalityX1:mousedown, window:mouseup] > window:mousemove!",
+            "update": "[clamp(min(fatalityBrush[1], invert('fatalityScale', x())),0,width), fatalityBrush[1]]"
+          },
+          {
+            "events": "[@fatalityX2:mousedown, window:mouseup] > window:mousemove!",
+            "update": "[fatalityBrush[0], clamp(max(fatalityBrush[0], invert('fatalityScale', x())),0,width)]"
+          },
+          {
+            "events": "@fatalityX1:dblclick, @fatalityX2:dblclick",
+            "update": "[fatalityExtent[0], fatalityExtent[1]]"
+          }
+        ]
+      },
+      {"name": "yearBrush",
+      "update": "yearExtent",
+      "on": [
+        {
+          "events": "[@yearSelection:mousedown, window:mouseup] > window:mousemove!, [@yearBackground:mousedown, window:mouseup] > window:mousemove!",
+          "update": 
+          "[clamp(min(yearAnchor, invert('yearScale', x())),yearMin,yearMax), clamp(max(yearAnchor, invert('yearScale', x())),yearMin,yearMax)]"
+        },
+        {
+          "events": "[@yearX1:mousedown, window:mouseup] > window:mousemove!",
+          "update": "[clamp(min(yearBrush[1], invert('yearScale', x())),yearMin,yearMax), yearBrush[1]]"
+        },
+        {
+          "events": "[@yearX2:mousedown, window:mouseup] > window:mousemove!",
+          "update": "[yearBrush[0], clamp(max(yearBrush[0], invert('yearScale', x())),yearMin,yearMax)]"
+        },
+        {
+          "events": "@yearX1:dblclick, @yearX2:dblclick",
+          "update": "[yearExtent[0], yearExtent[1]]"
+        }
+      ]
+      },
+      {"name": "brushX", 
+      "init": "[0, 200]",
+      "on": [
+        {
+          "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
+          "update": "[x(), x()]"
+        },
+        {
+          "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+          "update": "[brushX[0], clamp(x(), 0, width)]"
+        },
+        {
+          "events": [{"signal": "scroll"}, {"signal": "drag"}],
+          "update": "[0,0]"
+        }
+      ]
+      },
+      {"name": "brushY",
+        "init": "[0, mapHeight]",
+        "on": [
+          {
+            "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
+            "update": "[y(), y()]"
+          },
+          {
+            "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+            "update": "[brushY[0], clamp(y(), 0, height)]"
+          }
+        ]
+      },
+      {"name": "fatalityAnchor", 
+      "value": 0,
+        "on": [
+          {"events": "@fatalitySelection:mousedown!, @fatalityBackground:mousedown!", "update": "invert('fatalityScale', x())"}
+        ]
+      },
+      {"name": "yearAnchor", 
+      "value": 1909,
+        "on": [
+          {"events": "@yearSelection:mousedown!, @yearBackground:mousedown!", "update": "invert('yearScale', x())"}
+        ]
+      },
+      {"name": "scroll",
+        "value": 150,
+        "on": [
+          {
+            "events": "@land:wheel!, @water:wheel!, @point:wheel!",
+            "update": "clamp(scroll * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+          }
+        ]
+      },
+      {"name": "angles",
+        "value": [0, 0],
+        "on": [
+          {"events": "@land:mousedown, @water:mousedown", "update": "[rotateX, centerY]"}
+        ]
+      },
+      {"name": "cloned",
+        "value": null,
+        "on": [
+          {"events": "@land:mousedown, @water:mousedown", "update": "copy('projection')"}
+        ]
+      },
+      {"name": "start",
+        "value": null,
+        "on": [
+          {"events": "@land:mousedown, @water:mousedown", "update": "invert(cloned, xy())"}
+        ]
+      },
+      {"name": "drag",
+        "value": null,
+        "on": [
+          {
+            "events": "[@land:mousedown[!event.shiftKey], window:mouseup] > window:mousemove, [@water:mousedown[!event.shiftKey], window:mouseup] > window:mousemove",
+            "update": "invert(cloned, xy())"
+          }
+        ]
+      },
+      {"name": "delta",
+        "value": null,
+        "on": [
+          {
+            "events": { "signal": "drag" },
+            "update": "[drag[0] - start[0], start[1] - drag[1]]"
+          }
+        ]
+      },
+      {"name": "rotateX",
+        "value": 0,
+        "on": [
+          {
+            "events": { "signal": "delta" },
+            "update": "angles[0] + delta[0]"
+          }
+        ]
+      },
+      {"name": "centerY",
+        "value": 0,
+        "on": [
+          {
+            "events": { "signal": "delta" },
+            "update": "clamp(angles[1] + delta[1], -60, 60)"
+          }
+        ]
+      },
+      {"name": "selectManufacturer",
+        "value": "All",
+        "bind": {
+          "name": "Select Manufacturer",
+          "input": "select",
+          "options": [
+            "All", "Airbus", "Antonov", "ATR", "Aero", "Aerospatiale", "Avia", "Avro",
+             "BAE", "BAC", "Beechcraft", "Bell", "Bleriot", "Boeing", "Breguet", "Bristol", 
+             "British", "Britten Norman", "CASA", "Canadair", "Cessna", "Consolidated", 
+             "Convair", "Curtiss", "Curtiss Wright", "Dassault", "Dewoitine", "Douglas", 
+             "Dornier", "Embraer", "Eurocopter", "Fairchild", "Fairchild Hiller", "Fokker", 
+             "Ford", "GAZ", "GAF", "Gates", "Grumman", "Handley Page", "Hawker Siddeley", 
+             "Heinkel", "IAI", "Ilyushin", "Junkers", "Latecoere", "Learjet", "Let", 
+             "Liore et Olivier", "Lockheed", "McDonnell Douglas", "Martin", "Mil", 
+             "Missing value", "NAMC", "Nord", "Pilatus", "Piper", "Rockwell", "Saab", 
+             "Savoia Marchetti", "Short", "Sikorsky", "Stearman", "Stinson", "Sud Aviation", 
+             "Swearingen", "Travel", "Tupolev", "Vickers", "Yakovlev", "Zeppelin", "Other"
+          ]
+        }
+      }
+    ],
+    "data": [
+      {"name": "world",
+        "url": "https://raw.githubusercontent.com/vega/vega/main/packages/vega-loader/test/data/world-110m.json",
+        "format": { "type": "topojson", "feature": "countries" },
+        "transform": [
+          {
+            "type": "geopath",
+            "projection": "projection"
+          }
+        ]
+      },
+      {"name": "sphere",
+        "values": [{"type": "Sphere"}]
+      },
+      {"name": "crashes",
+        "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV2.csv",
+        "format": {"type": "csv", "parse": "auto"},
+        "transform": [
+          {
+            "type": "geopoint",
+            "projection": "projection",
+            "fields": ["Longitude", "Latitude"]
+          },
+          {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
+          {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
+          {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"},
+          {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
+          {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
+          ]
+      },
+      {
+        "name": "brushedCrashes",
+        "source": "crashes",
+        "transform": [
+          {"type": "filter", "expr": "datum.x >= brushX[0] && datum.x <= brushX[1]"},
+          {"type": "filter", "expr": "datum.y >= brushY[0] && datum.y <= brushY[1]"}
+        ]
+      },
+      {
+        "name": "aggregatedBrushedCrashes",
+        "source": "brushedCrashes",
+        "transform": [
+          {
+          "type": "aggregate",
+          "groupby": ["Manufacturer"],
+          }
+        ]
+      },
+  
+  
+    ],
+    "scales": [
+      {"name": "fatalitySize",
+        "type": "linear",
+        "domain": [0, 583],
+        "range": [16, 1000]
+      },
+      {"name": "fatalityScale",
+        "type": "linear",
+        "round": true,
+        "range": [0, {"signal": "selectionWidth"}],
+        "domain": {"signal": "fatalityExtent"}
+      },
+      {"name": "yearScale",
+      "type": "linear",
+      "round": true,
+      "zero": false,
+      "range": [0, {"signal": "selectionWidth"}],
+      "domain": {"signal": "yearExtent"}
+      },
+      {
+        "name": "xscale",
+        "type": "band",
+        "domain": {"data": "aggregatedBrushedCrashes", "field": "Manufacturer"},
+        "range": "width",
+        "padding": 0.05,
+        "round": true
+      },
+      {
+        "name": "yscale",
+        "domain": {"data": "aggregatedBrushedCrashes", "field": "count"},
+        "nice": true,
+        "range": "height"
+      }
+    ],
+    "projections": [
+      {"name": "projection",
+        "type": "mercator",
+        "scale": { "signal": "scroll" },
+        "rotate": [{ "signal": "rotateX" }, 0, 0],
+        "center": [0, { "signal": "centerY" }],
+        "translate": [{ "signal": "width / 2" }, { "signal": "height / 2" }]
+      }
+    ],
+    "marks": [
+      {"name": "interactiveMap",
+        "type": "group",
+        "encode": {
+          "enter": {
+            "width": { "signal": "mapWidth" },
+            "height": { "signal": "mapHeight" },
+            "clip": { "value": true }
+          }
+        },
+        "marks": [
+          {
+            "name": "water",
+            "type": "shape",
+            "from": {"data": "sphere"},
+            "encode": {
+              "enter": {
+                "fill": {"value": "aliceblue"}
+              }
+            },
+            "transform": [
+              { "type": "geoshape", "projection": "projection" }
+            ]
+          },
+          {
+            "name": "land",
+            "type": "path",
+            "from": { "data": "world" },
+            "encode": {
+              "enter": {
+                "fill": { "value": "#dedede" },
+                "stroke": { "value": "white" }
+              },
+              "update": {
+                "path": { "field": "path" }
+              }
+            }
+          },
+          {
+            "name": "point",
+            "type": "symbol",
+            "from": {"data": "crashes"},
+            "sort": {"field": "datum.Fatalities", "order":"descending"},
+            "encode": {
+              "enter": {
+                "size": {"scale": "fatalitySize", "field": "Fatalities"}, 
+                "shape": {"value": "circle"},
+                "fill": {"value": "steelblue"},
+                "fillOpacity": {"value": 0.8},
+                "stroke": {"value": "white"},
+                "strokeWidth": {"value": 1.5},
+                "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities, 'Year': datum.Year, 'Summary': datum.Summary}"}
+              },
+              "update": {
+                "x": {"field": "x"},
+                "y": {"field": "y"},
+                "fill": {"value": "steelblue"}
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }               
+            }
+          }
+        ]
+      },
+      {"name": "brush",
+        "type": "rect",
+        "encode": {
+          "enter": {
+            "fill": {"value": "#eee"}
+          },
+          "update": {
+            "opacity": {"value": 0.4},
+            "x": {"signal": "brushX[0]"},
+            "x2": {"signal": "brushX[1]"},
+            "y": {"signal": "brushY[0]"},
+            "y2": {"signal": "brushY[1]"}
+          }
+        }
+      },
+      {"name": "histogram",
+        "type": "group",
+        "axes": [
+          { "orient": "top", "scale": "xscale" },
+          { "orient": "left", "scale": "yscale" }
+          ],
+        "marks": [
+              {
+                "type": "rect",
+                "from": {"data":"aggregatedBrushedCrashes"},
+                "encode": {
+                  "enter": {
+                    "x": {"scale": "xscale", "field": "Manufacturer"},
+                    "width": {"scale": "xscale", "band": 1},
+                    "y": {"scale": "yscale", "field": "count"},
+                    "y2": {"scale": "yscale", "value": 0}
+                  },
+                  "update": {
+                    "fill": {"value": "steelblue"}
+                  },
+                  "hover": {
+                    "fill": {"value": "red"}
+                  }
+                }
+              },
+              {
+                "type": "text",
+                "encode": {
+                  "enter": {
+                    "align": {"value": "center"},
+                    "baseline": {"value": "bottom"},
+                    "fill": {"value": "#333"}
+                  },
+                  "update": {
+                    "x": {"scale": "xscale", "signal": "tooltip.Manufacturer", "band": 0.5},
+                    "y": {"scale": "yscale", "signal": "tooltip.count", "offset": -2},
+                    "text": {"signal": "tooltip.count"},
+                    "fillOpacity": [
+                      {"test": "isNaN(tooltip.count)", "value": 0},
+                      {"value": 1}
+                    ]
+                  }
+                }
+              }
+        ]
+      },
+      {"name": "selectionBarFatalities",
+        "type": "group",
+        "signals": [
+          { "name": "width", "update": "selectionWidth" },
+          { "name": "height", "update": "selectionHeight" }
+        ],
+        "encode": {
+          "update": {
+            "width": { "signal": "selectionWidth" },
+            "height": { "signal": "selectionHeight" }
+          }
+        },
+        "axes": [
+          { "orient": "bottom", "scale": "fatalityScale", "format": "d" }
+        ],
+        "marks": [
+          {
+            "type": "rect",
+            "name": "fatalityBackground",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+                "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#ececec"},
+                "cornerRadius": {"value": 60}
+              }
+            }
+          },
+          {
+            "type": "rect",
+            "name": "fatalitySelection",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+                "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#0671ed"},
+                "cornerRadius": {"value": 60}
+              },
+              "update": {
+                "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"},
+                "x2": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "fatalityX1",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "fatalityX2",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMax"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
+              }
+            }
+          }
+        ]
+      },
+      {"name": "paddingOfGridLayout",
+        "type": "group"},
+      {"name": "selectionBarYear",
+        "type": "group",
+        "signals": [
+          { "name": "width", "update": "selectionWidth" },
+          { "name": "height", "update": "selectionHeight" }
+        ],
+        "encode": {
+          "update": {
+            "width": { "signal": "selectionWidth" },
+            "height": { "signal": "selectionHeight" }
+          }
+        },
+        "axes": [
+          {"orient": "bottom", "scale": "yearScale", "format": "d", "tickCount": 15}
+        ],
+        "marks": [
+          {
+            "type": "rect",
+            "name": "yearBackground",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMin"},
+                "x2": {"scale": "yearScale", "signal": "yearMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#ececec"},
+                "cornerRadius": {"value": 60}
+              }
+            }
+          },
+          {
+            "type": "rect",
+            "name": "yearSelection",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMin"},
+                "x2": {"scale": "yearScale", "signal": "yearMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#0671ed"},
+                "cornerRadius": {"value": 60}
+              },
+              "update": {
+                "x": {"signal": "scale('yearScale', yearBrush[0])"},
+                "x2": {"signal": "scale('yearScale', yearBrush[1])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "yearX1",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMin"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('yearScale', yearBrush[0])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "yearX2",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMax"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('yearScale', yearBrush[1])"}
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
