@@ -21,7 +21,7 @@
         {"events": "rect:mouseout",  "update": "{}"}
       ]
     },
-      {
+    {
       "name": "selected",
       "value": false,
       "on": [
@@ -29,8 +29,6 @@
         {"events": "rect:mouseout",  "update": "false"}
       ]
     },
-
-
     {"name": "fatalityMin", "value": 0},
     {"name": "fatalityMax", "value": 600},
     { "name": "fatalityExtent", "init": "[fatalityMin, fatalityMax]" },
@@ -84,7 +82,7 @@
     ]
     },
     {"name": "brushX", 
-    "init": "[0, 200]",
+    "init": "[0, 0]",
     "on": [
       {
         "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -111,6 +109,14 @@
           "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
           "update": "[brushY[0], clamp(y(), 0, height)]"
         }
+      ]
+    },
+    {
+      "name": "areWeBrushing",
+      "value": false,
+      "on": [
+        {"events": "if(test, thenValue, elseValue)", "update": "true"},
+        {"events": "@yo:mouseout",  "update": "false"}
       ]
     },
     {"name": "fatalityAnchor", 
@@ -377,9 +383,13 @@
               "fill": [
                 {
                   "test": "indata('brushedAndFilteredCrashes', 'X', datum.X)",
-                  "value": "green"
+                  "value": "red"
                 },
-                {"value": "steelblue"}
+                {
+                  "test": "indata('brushedCrashes', 'X', datum.X) && !indata('brushedAndFilteredCrashes', 'X', datum.X) || brushX[0]==0",
+                  "value": "steelblue"
+                },
+                {"value": "silver"}
               ]
             },
             "hover": {
@@ -390,7 +400,7 @@
       ]
     },
     
-    {"name": "brush",
+    {"name": "yo",
       "type": "rect",
       "encode": {
         "enter": {
@@ -616,4 +626,4 @@
       ]
     }
   ]
-}æ
+}
