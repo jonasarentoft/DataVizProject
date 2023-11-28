@@ -111,7 +111,11 @@
       "on": [
         {
           "events": "@land:wheel!, @water:wheel!, @point:wheel!",
+<<<<<<< Updated upstream
           "update": "clamp(scroll * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+=======
+          "update": "clamp(scale * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 150, 3000)"
+>>>>>>> Stashed changes
         }
       ]
     },
@@ -175,18 +179,16 @@
         "name": "Select Manufacturer",
         "input": "select",
         "options": [
-          "All", "Airbus", "Antonov", "ATR", "Aero", "Aerospatiale", "Avia", "Avro",
-           "BAE", "BAC", "Beechcraft", "Bell", "Bleriot", "Boeing", "Breguet", "Bristol", 
-           "British", "Britten Norman", "CASA", "Canadair", "Cessna", "Consolidated", 
-           "Convair", "Curtiss", "Curtiss Wright", "Dassault", "Dewoitine", "Douglas", 
-           "Dornier", "Embraer", "Eurocopter", "Fairchild", "Fairchild Hiller", "Fokker", 
-           "Ford", "GAZ", "GAF", "Gates", "Grumman", "Handley Page", "Hawker Siddeley", 
-           "Heinkel", "IAI", "Ilyushin", "Junkers", "Latecoere", "Learjet", "Let", 
-           "Liore et Olivier", "Lockheed", "McDonnell Douglas", "Martin", "Mil", 
-           "Missing value", "NAMC", "Nord", "Pilatus", "Piper", "Rockwell", "Saab", 
-           "Savoia Marchetti", "Short", "Sikorsky", "Stearman", "Stinson", "Sud Aviation", 
-           "Swearingen", "Travel", "Tupolev", "Vickers", "Yakovlev", "Zeppelin", "Other"
-        ]
+          "All", "Antonov", "ATR", "Avia", "Airbus", "Avro", "BAE", "Beechcraft", "Bell",
+          "Bleriot", "Boeing", "Breguet", "Bristol", "British", "CASA", "Cessna",
+          "Consolidated", "Convair", "Curtiss", "Curtiss Wright", "Dassault", "deHavilland",
+          "Dewoitine", "Douglas", "Dornier", "Embraer", "Eurocopter", "Fairchild",
+          "Fairchild Hiller", "Fokker", "Ford", "GAZ", "Gates", "Grumman", "Handley Page",
+          "Hawker Siddeley", "Heinkel", "IAI", "Ilyushin", "Junkers", "Latecoere", "Learjet",
+          "Let", "Liore et Olivier", "Lockheed", "Martin", "McDonnell Douglas", "Mil",
+          "Missing value", "NAMC", "Nord", "Pilatus", "Piper", "Rockwell", "Saab",
+          "Savoia Marchetti", "Short", "Sikorsky", "Stearman", "Stinson", "Sud Aviation",
+          "Swearingen", "Travel", "Tupolev", "Vickers", "Yakovlev", "Zeppelin"]          
       }
     }
   ],
