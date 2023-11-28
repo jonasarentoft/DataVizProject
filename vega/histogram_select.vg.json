@@ -245,7 +245,6 @@
         {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
         ]
     },
-
     {
       "name": "brushedCrashes",
       "source": "crashes",
@@ -256,10 +255,8 @@
     },
     {
       "name": "brushedAndFilteredCrashes",
-      "source": "crashes",
+      "source": "brushedCrashes",
       "transform": [
-        {"type": "filter", "expr": "datum.x >= brushX[0] && datum.x <= brushX[1]"},
-        {"type": "filter", "expr": "datum.y >= brushY[0] && datum.y <= brushY[1]"},
         {"type": "filter", "expr": "datum.Manufacturer == selected"}
         ]
     },
@@ -272,6 +269,19 @@
         {
         "type": "aggregate",
         "groupby": ["Manufacturer"]
+        },
+        {
+          "type": "collect",
+          "sort": {"order":"descending", "field": "count"}
+        },
+        {
+          "type": "window",
+          "sort": {"field": "count", "order":"descending"},
+          "ops": ["row_number"], "as": ["rank"]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.rank <= 10"
         },
         {
           "type": "collect",
@@ -303,7 +313,7 @@
       "name": "yscale",
       "type": "band",
       "domain": {"data": "aggregatedBrushedCrashes", "field": "Manufacturer"},
-      "range": "height",
+      "range":  [0, {"signal": "histHeight"}],
       "padding": 0.1,
       "round": true
     },
@@ -311,7 +321,7 @@
       "name": "xscale",
       "domain": {"data": "aggregatedBrushedCrashes", "field": "count"},
       "nice": true,
-      "range": "width",
+      "range":  [0, {"signal": "histWidth"}],
       "padding": 0.05,
       "round": true
     }
