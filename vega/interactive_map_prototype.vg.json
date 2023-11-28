@@ -4,12 +4,21 @@
   "width": 600,
   "height": 400,
   "autosize": "pad",
-  "layout": {"padding": 0, "columns": 1, "align": "each"},
+  "layout": {"padding":5, "rows": 3, "columns": 2, "align": "each"},
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
     { "name": "selectionWidth", "value": 300 },
     { "name": "selectionHeight", "value": 20 },
+
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    },
 
 
     {"name": "fatalityMin", "value": 0},
@@ -65,7 +74,7 @@
     ]
     },
     {"name": "brushX", 
-    "value": 0,
+    "init": "[0, 200]",
     "on": [
       {
         "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -82,7 +91,7 @@
     ]
     },
     {"name": "brushY",
-      "value": 0,
+      "init": "[0, mapHeight]",
       "on": [
         {
           "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -227,7 +236,19 @@
         {"type": "filter", "expr": "datum.x >= brushX[0] && datum.x <= brushX[1]"},
         {"type": "filter", "expr": "datum.y >= brushY[0] && datum.y <= brushY[1]"}
       ]
-    }
+    },
+    {
+      "name": "aggregatedBrushedCrashes",
+      "source": "brushedCrashes",
+      "transform": [
+        {
+        "type": "aggregate",
+        "groupby": ["Manufacturer"],
+        },
+        {"type": "collect", "sort": {"field": "count"}}
+      ]
+    },
+
   ],
   "scales": [
     {"name": "fatalitySize",
@@ -247,6 +268,22 @@
     "zero": false,
     "range": [0, {"signal": "selectionWidth"}],
     "domain": {"signal": "yearExtent"}
+    },
+    {
+      "name": "yscale",
+      "type": "band",
+      "domain": {"data": "aggregatedBrushedCrashes", "field": "Manufacturer"},
+      "range": "height",
+      "padding": 0.05,
+      "round": true
+    },
+    {
+      "name": "xscale",
+      "domain": {"data": "aggregatedBrushedCrashes", "field": "count"},
+      "nice": true,
+      "range": "width",
+      "padding": 0.05,
+      "round": true
     }
   ],
   "projections": [
@@ -338,6 +375,54 @@
         }
       }
     },
+    {"name": "histogram",
+      "type": "group",
+      "axes": [
+        { "orient": "bottom", "scale": "xscale" },
+        { "orient": "left", "scale": "yscale" }
+
+        ],
+      "marks": [
+            {
+              "type": "rect",
+              "from": {"data":"aggregatedBrushedCrashes"},
+              "encode": {
+                "enter": {
+                  "y": {"scale": "yscale", "field": "Manufacturer"},
+                 "height": {"scale": "yscale", "band": 0.5},
+                  "width": {"scale": "yscale", "band": 0.5},
+                  "x": {"scale": "xscale", "field": "count"},
+                  "x2": {"scale": "xscale", "value": 0}
+                },
+                "update": {
+                  "fill": {"value": "steelblue"}
+                },
+                "hover": {
+                  "fill": {"value": "red"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "encode": {
+                "enter": {
+                  "align": {"value": "center"},
+                  "baseline": {"value": "bottom"},
+                  "fill": {"value": "#333"}
+                },
+                "update": {
+                  "x": {"scale": "xscale", "signal": "tooltip.Manufacturer", "band": 0.5},
+                  "y": {"scale": "yscale", "signal": "tooltip.count", "offset": -2},
+                  "text": {"signal": "tooltip.count"},
+                  "fillOpacity": [
+                    {"test": "isNaN(tooltip.count)", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+      ]
+    },
     {"name": "selectionBarFatalities",
       "type": "group",
       "signals": [
@@ -418,6 +503,8 @@
         }
       ]
     },
+    {"name": "paddingOfGridLayout",
+      "type": "group"},
     {"name": "selectionBarYear",
       "type": "group",
       "signals": [
