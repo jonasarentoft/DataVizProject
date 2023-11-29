@@ -257,11 +257,10 @@
       "type": "aggregate",
       "groupby": ["Time"]
       },
-      {"type": "collect", "sort": {"field": "count"}},
-      {"type": "pie", "field": "count"}
+      {"type": "collect", "sort": {"field": "Time"}},
+      {"type": "pie"}
     ] 
   }
-
   ],
   "scales": [
     {"name": "fatalitySize",
@@ -300,7 +299,7 @@
     "type": "sqrt",
     "domain": {"data": "timeAggregatedBrushedCrashes", "field": "count"},
     "zero": true,
-    "range": [20, 200]
+    "range": [20, 130]
   }
   ],
   "projections": [
@@ -606,17 +605,20 @@
     "type": "group",
     "marks": [
       {"type": "arc",
+      
         "from": {"data": "timeAggregatedBrushedCrashes"},
         "encode": {
+          "tooltip": {"content": "value"},
           "enter": {
             "x": {"field": {"group": "width"}, "mult": 0.5},
-            "y": {"field": {"group": "height"}, "mult": 0.5},
+            "y": {"field": {"group": "height"}, "mult": 0.5}
+          },
+          "update": {
+            "tooltip": {"signal": "datum.count"},
             "startAngle": {"field": "startAngle"},
             "endAngle": {"field": "endAngle"},
             "innerRadius": {"value": 20},
-            "outerRadius": {"scale": "r", "field": "count"}
-          },
-          "update": {
+            "outerRadius": {"scale": "r", "field": "count"},
           "fill": {"value": "steelblue"}
           },
           "hover": {
@@ -624,13 +626,17 @@
           }
         }
       },
+      {"type": "arc",
+      "from": {"data": "timeAggregatedBrushedCrashes"}},
       {"type": "text",
       "from": {"data": "timeAggregatedBrushedCrashes"},
       "encode": {
         "enter": {
           "x": {"field": {"group": "width"}, "mult": 0.5},
-          "y": {"field": {"group": "height"}, "mult": 0.5},
-          "radius": {"scale": "r", "field": "count", "offset": 15},
+          "y": {"field": {"group": "height"}, "mult": 0.5}
+          },
+          "update": {
+          "radius": {"scale": "r", "field": "count", "offset": 20},
           "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
           "fill": {"value": "#000"},
           "align": {"value": "center"},
