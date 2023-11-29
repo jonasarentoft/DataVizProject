@@ -5,6 +5,15 @@
   "height": 700,
   "autosize": "pad",
   "layout": {"padding":5, "rows": 3, "columns": 2, "align": "center"},
+  "title": {
+    "text": "Visualizing Airplane Crashes",
+    "subtitle": "by Søren, Rasmus, Peter and Jonas",
+    "subtitleFontSize": 20,
+    "color": "#005ca5",
+    "fontSize": 32,
+    "dy": 0,
+    "fontWeight": "bold"
+  },
   "signals": [
     { "name": "mapWidth", "value": 600 },
     { "name": "mapHeight", "value": 400 },
