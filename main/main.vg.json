@@ -1,7 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "padding": 5,
-  "width": 1000,
+  "width": 800,
   "height": 700,
   "autosize": "pad",
   "layout": {"padding":5, "rows": 3, "columns": 2, "align": "center"},
@@ -15,7 +15,7 @@
     "fontWeight": "bold"
   },
   "signals": [
-    { "name": "mapWidth", "value": 600 },
+    { "name": "mapWidth", "value": 800 },
     { "name": "mapHeight", "value": 400 },
     { "name": "histWidth", "value": 600 },
     { "name": "histHeight", "value": 400 },
@@ -31,11 +31,19 @@
       ]
     },
     {
-      "name": "selected",
+      "name": "hoveredManufacturer",
       "value": false,
       "on": [
         {"events": "rect:mouseover", "update": "datum.Manufacturer"},
         {"events": "rect:mouseout",  "update": "false"}
+      ]
+    },
+    {
+      "name": "hoveredTime",
+      "value": false,
+      "on": [
+        {"events": "arc:mouseover", "update": "datum.Time"},
+        {"events": "arc:mouseout",  "update": "false"}
       ]
     },
     {"name": "fatalityMin", "value": 0},
@@ -285,11 +293,16 @@
       "name": "brushedAndFilteredCrashes",
       "source": "brushedCrashes",
       "transform": [
-        {"type": "filter", "expr": "datum.Manufacturer == selected"}
+        {"type": "filter", "expr": "datum.Manufacturer == hoveredManufacturer || datum.Time == hoveredTime"}
         ]
     },
-
-
+    {
+      "name": "brushedAndTimeFilteredCrashes",
+      "source": "brushedCrashes",
+      "transform": [
+        {"type": "filter", "expr": "datum.Time == hoveredTime"}
+        ]
+    },
     {
       "name": "aggregatedBrushedCrashes",
       "source": "brushedCrashes",
