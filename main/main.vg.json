@@ -128,29 +128,15 @@
         }
       ]
     },
-    {"name": "brushRectX",
-      "init": "[0,2000]",
+    {"name": "areWeBrushing",
+      "init": "false",
       "on": [
-        {
-          "events": "@land:mousedown, @water:mousedown",
-          "update": "[0,2000]"
+        {"events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+        "update": "true"
         },
         {
-          "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
-          "update": "[brushX[0], clamp(x(), 0, height)]"
-        }
-      ]
-    },
-    {"name": "brushRectY",
-      "init": "[0,2000]",
-      "on": [
-        {
-          "events": "@land:mousedown, @water:mousedown",
-          "update": "[0,2000]"
-        },
-        {
-          "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
-          "update": "[brushY[0], clamp(y(), 0, height)]"
+          "events": "@land:mousedown, @water:mousedown, @land:wheel!, @water:wheel!, @point:wheel!",
+          "update": "false"
         }
       ]
     },
@@ -284,8 +270,8 @@
       "name": "brushedCrashes",
       "source": "crashes",
       "transform": [
-        {"type": "filter", "expr": "datum.x >=brushRectX[0] && datum.x <= brushRectX[1]"},
-        {"type": "filter", "expr": "datum.y >= brushRectY[0] && datum.y <= brushRectY[1]"}
+        {"type": "filter", "expr": "(areWeBrushing == true && datum.x >=brushX[0] && datum.x <= brushX[1]) || areWeBrushing == false"},
+        {"type": "filter", "expr": "(areWeBrushing == true && datum.y >= brushY[0] && datum.y <= brushY[1]) || areWeBrushing == false"}
         ]
         
     },
