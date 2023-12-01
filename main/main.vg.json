@@ -358,7 +358,7 @@
       ]
     },
 
-    {"name": "timeAggregatedBrushedCrashes",
+    {"name": "tmpTimeAggregatedBrushedCrashes",
       "source": "brushedCrashes",
       "transform": [
         {
@@ -368,6 +368,16 @@
         {"type": "collect", "sort": {"field": "Time"}},
         {"type": "pie"}
       ] 
+    },
+    {"name": "timeAggregatedBrushedCrashes",
+      "source": "tmpTimeAggregatedBrushedCrashes",
+      "transform": [
+        {"type": "joinaggregate",
+        "fields": ["count"],
+        "ops": ["max"],
+        "as": ["maxDist"]
+        }
+      ]
     },
       {"name": "circles",
       "source": "timeAggregatedBrushedCrashes",
@@ -737,7 +747,7 @@
         }
       ]
     },
-          {"name": "radial",
+    {"name": "radial",
       "type": "group",
       "marks": [
         {"type": "arc",
@@ -763,6 +773,7 @@
             }
           }
         },
+        
         {"type": "arc",
         "from": {"data": "circles"},
         "encode": {
@@ -780,24 +791,43 @@
             }
           }
         },
-        {"type": "text",
-        "from": {"data": "timeAggregatedBrushedCrashes"},
-        "encode": {
-          "enter": {
-            "x": {"field": {"group": "width"}, "mult": 0.5},
-            "y": {"field": {"group": "height"}, "mult": 0.5}
+        {"type": "arc",
+          "from": {"data": "timeAggregatedBrushedCrashes"},
+          "encode": {
+            "tooltip": {"content": "value"},
+            "enter": {
+              "x": {"field": {"group": "width"}, "mult": 0.5},
+              "y": {"field": {"group": "height"}, "mult": 0.5},
+              "stroke": {"value": "silver"},
+              "fillOpacity": {"value": 0}
             },
             "update": {
-            "radius": {"scale": "r", "field": "count", "offset": 20},
-            "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
-            "fill": {"value": "#000"},
-            "align": {"value": "center"},
-            "angle": {"value": 0},
-            "baseline": {"value": "middle"},
-            "text": {"field": "Time"}
+              "startAngle": {"field": "startAngle"},
+              "endAngle": {"field": "endAngle"},
+              "innerRadius": {"value": 10},
+              "outerRadius": {"scale": "r", "field": "maxDist"}
+            }
           }
-      }
-    }
+        },
+       {"type": "text",
+          "from": {"data": "timeAggregatedBrushedCrashes"},
+          "encode": {
+            "enter": {
+              "x": {"field": {"group": "width"}, "mult": 0.5},
+              "y": {"field": {"group": "height"}, "mult": 0.5}
+              },
+              "update": {
+              "radius": {"scale": "r", "field": "maxDist", "offset": 20},
+              "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
+              "fill": {"value": "#000"},
+              "align": {"value": "center"},
+              "angle": {"signal": "(((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90) < 270 ? (((datum.startAngle + datum.endAngle)/2 * 57.2957795) - 90) : (((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90)"}, 
+              "baseline": {"value": "middle"},
+              "text": {"field": "Time"},
+              "fontSize" : {"value": 12}
+            }
+          }
+        }
       ]
       }
   ]
