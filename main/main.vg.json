@@ -465,6 +465,7 @@
           "name": "point",
           "type": "symbol",
           "from": {"data": "crashes"},
+          "sort": {"field": "datum.Fatalities", "order":"descending"},
           "encode": {
             "enter": {
               "size": {"scale": "fatalitySize", "field": "Fatalities"}, 
