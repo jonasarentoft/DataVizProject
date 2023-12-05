@@ -279,6 +279,7 @@
     }
   ],
   "data": [
+
     {"name": "world",
       "url": "https://raw.githubusercontent.com/vega/vega/main/packages/vega-loader/test/data/world-110m.json",
       "format": { "type": "topojson", "feature": "countries" },
@@ -420,6 +421,45 @@
         }
       ]
     },
+              {
+    "name": "finalRadial",
+    "values": [
+     {"Time": "00-01"},
+      {"Time": "01-02"},
+      {"Time": "02-03"},
+      {"Time": "03-04"},
+      {"Time": "04-05"},
+      {"Time": "05-06"},
+      {"Time": "06-07"},
+      {"Time": "07-08"},
+      {"Time": "08-09"},
+      {"Time": "09-10"},
+      {"Time": "10-11"},
+      {"Time": "11-12"},
+      {"Time": "12-13"},
+      {"Time": "13-14"},
+      {"Time": "14-15"},
+      {"Time": "15-16"},
+      {"Time": "16-17"},
+      {"Time": "17-18"},
+      {"Time": "18-19"},
+      {"Time": "19-20"},
+      {"Time": "20-21"},
+      {"Time": "21-22"},
+      {"Time": "22-23"},
+      {"Time": "23-00"}
+    ],
+          "transform": [
+        {
+        "type": "lookup",
+        "from": "timeAggregatedBrushedCrashes",
+        "key": "Time",
+        "fields": ["Time"],
+        "values": ["count"],
+        "as": ["count"],
+        "default": 0
+      }
+      ]},
       {"name": "circles",
       "source": "timeAggregatedBrushedCrashes",
       "transform": [
@@ -432,7 +472,7 @@
         {"type": "formula", "as": "50", "expr": "datum.max_count*0.5"},
         {"type": "formula", "as": "75", "expr": "datum.max_count*0.75"},
         {"type": "fold", "fields": ["25","50","75"]},
-        {"type": "pie"}
+        {"type": "pie"},
       ] 
     }    
   ],
