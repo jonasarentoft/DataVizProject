@@ -38,6 +38,27 @@
         {"events": "rect:mouseout",  "update": "false"}
       ]
     },
+    {"name": "clickedManufacturer",
+      "value": null,
+      "on": [
+        {"events": "@histogramBars:mousedown", "update": "{Manufacturer: datum.Manufacturer}", "force": true}
+      ]
+    },
+    {"name": "shiftClickedManufacturer",
+    "value": false,
+    "on": [
+      {
+          "events": "@histogramBars:click",
+          "update": "event.shiftKey",
+          "force":  true
+      }
+    ]
+    },
+    {"name": "clearAllManufacturer", "value": true,
+    "on": [
+      {"events": "@histogramBars:dblclick", "update": "true", "force": true}
+    ]
+    },
     {
       "name": "hoveredTime",
       "value": false,
@@ -45,6 +66,27 @@
         {"events": "arc:mouseover", "update": "datum.Time"},
         {"events": "arc:mouseout",  "update": "false"}
       ]
+    },
+    {"name": "clickedTime",
+      "value": null,
+      "on": [
+        {"events": "@timeInterval:mousedown", "update": "{Time: datum.Time}", "force": true}
+      ]
+    },
+    {"name": "shiftClickedTime",
+    "value": false,
+    "on": [
+      {
+          "events": "@timeInterval:click",
+          "update": "event.shiftKey",
+          "force":  true
+      }
+    ]
+    },
+    {"name": "clearAllTime", "value": true,
+    "on": [
+      {"events": "@timeInterval:dblclick", "update": "true", "force": true}
+    ]
     },
     {"name": "fatalityMin", "value": 0},
     {"name": "fatalityMax", "value": 600},
@@ -266,8 +308,21 @@
         {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
         ]
     },
-    {
-      "name": "brushedCrashes",
+    {"name": "selectedManufacturers",
+      "on": [
+        {"trigger": "clickedManufacturer", "insert": "clickedManufacturer"},
+        {"trigger": "clearAllManufacturer", "remove": true},
+        {"trigger": "shiftClickedManufacturer && clickedManufacturer", "toggle": "clickedManufacturer"}
+      ]
+    },
+    {"name": "selectedTimeIntervals",
+      "on": [
+        {"trigger": "clickedTime", "insert": "clickedTime"},
+        {"trigger": "clearAllTime", "remove": true},
+        {"trigger": "shiftClickedTime && clickedTime", "toggle": "clickedTime"}
+      ]
+    },
+    {"name": "brushedCrashes",
       "source": "crashes",
       "transform": [
         {"type": "filter", "expr": "(areWeBrushing == true && datum.x >=brushX[0] && datum.x <= brushX[1]) || areWeBrushing == false"},
@@ -482,12 +537,17 @@
               "fill": {"value": "steelblue"},
               "fillOpacity": {"value": 0.8},
               "stroke": {"value": "white"},
-              "strokeWidth": {"value": 1.5},
-              "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities, 'Year': datum.Year, 'Summary': datum.Summary}"}
+              "strokeWidth": {"value": 1.5}
             },
             "update": {
               "x": {"field": "x"},
               "y": {"field": "y"},
+              "size": [
+                {
+                  "test": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))",
+                  "scale": "fatalitySize", "field": "Fatalities"
+                }
+              ],
               "fill": [
                 {
                   "test": "indata('brushedAndFilteredCrashes', 'X', datum.X)",
@@ -498,6 +558,27 @@
                   "value": "steelblue"
                 },
                 {"value": "silver"}
+              ],
+              "fillOpacity": [
+                {
+                  "test": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))",
+                  "value": 1
+                },
+                {"value": 0}
+              ],
+
+              "stroke": [
+                {
+                  "test": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))",
+                  "value": "white"
+                },
+                {"value": null}
+              ],
+              "tooltip": [
+                {
+                  "test": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))",
+                  "signal": "{title: 'Location of crash: ' + datum.Location, 'Time': datum.Time, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities, 'Year': datum.Year, 'Summary': datum.Summary}"
+                }
               ]
             },
             "hover": {
@@ -532,6 +613,7 @@
         ],
       "marks": [
             {
+              "name": "histogramBars",
               "type": "rect",
               "from": {"data":"aggregatedBrushedCrashes"},
               "encode": {
@@ -543,7 +625,17 @@
                   "width": {"scale": "yscale", "band": 1},
                   "x": {"scale": "xscale", "field": "count"},
                   "x2": {"scale": "xscale", "value": 0},
-                  "fill": {"value": "steelblue"}
+                  "fill": [
+                    {
+                      "test": "!length(data('selectedManufacturers'))",
+                      "value": "steelblue"
+                    },
+                    {
+                      "test": "indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer)",
+                      "value": "firebrick"
+                    },
+                    {"value": "silver"}
+                  ]
                 },
                 "hover": {
                   "fill": {"value": "red"}
@@ -736,8 +828,8 @@
     {"name": "radial",
       "type": "group",
       "marks": [
-        {"type": "arc",
-        
+        {"name": "timeInterval",
+          "type": "arc",
           "from": {"data": "timeAggregatedBrushedCrashes"},
           "encode": {
             "tooltip": {"content": "value"},
@@ -752,7 +844,17 @@
               "innerRadius": {"value": 10},
               "outerRadius": {"scale": "r", "field": "count"},
               "padAngle": {"value": 0.01},
-            "fill": {"value": "steelblue"}
+              "fill": [
+                    {
+                      "test": "!length(data('selectedTimeIntervals'))",
+                      "value": "steelblue"
+                    },
+                    {
+                      "test": "indata('selectedTimeIntervals', 'Time', datum.Time)",
+                      "value": "firebrick"
+                    },
+                    {"value": "silver"}
+                  ]
             },
             "hover": {
               "fill": {"value": "red"}
