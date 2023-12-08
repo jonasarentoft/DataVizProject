@@ -419,30 +419,30 @@
     },
     {"name": "finalRadial",
     "values": [
-     {"Time": "00-01"},
-      {"Time": "01-02"},
-      {"Time": "02-03"},
-      {"Time": "03-04"},
-      {"Time": "04-05"},
-      {"Time": "05-06"},
-      {"Time": "06-07"},
-      {"Time": "07-08"},
-      {"Time": "08-09"},
-      {"Time": "09-10"},
-      {"Time": "10-11"},
-      {"Time": "11-12"},
-      {"Time": "12-13"},
-      {"Time": "13-14"},
-      {"Time": "14-15"},
-      {"Time": "15-16"},
-      {"Time": "16-17"},
-      {"Time": "17-18"},
-      {"Time": "18-19"},
-      {"Time": "19-20"},
-      {"Time": "20-21"},
-      {"Time": "21-22"},
-      {"Time": "22-23"},
-      {"Time": "23-00"}
+     {"Time": "00-01", "count":0},
+      {"Time": "01-02", "count":0},
+      {"Time": "02-03", "count":0},
+      {"Time": "03-04", "count":0},
+      {"Time": "04-05", "count":0},
+      {"Time": "05-06", "count":0},
+      {"Time": "06-07", "count":0},
+      {"Time": "07-08", "count":0},
+      {"Time": "08-09", "count":0},
+      {"Time": "09-10", "count":0},
+      {"Time": "10-11", "count":0},
+      {"Time": "11-12", "count":0},
+      {"Time": "12-13", "count":0},
+      {"Time": "13-14", "count":0},
+      {"Time": "14-15", "count":0},
+      {"Time": "15-16", "count":0},
+      {"Time": "16-17", "count":0},
+      {"Time": "17-18", "count":0},
+      {"Time": "18-19", "count":0},
+      {"Time": "19-20", "count":0},
+      {"Time": "20-21", "count":0},
+      {"Time": "21-22", "count":0},
+      {"Time": "22-23", "count":0},
+      {"Time": "23-00", "count":0}
     ],
       "transform": [
         {
@@ -550,8 +550,16 @@
           "width": {"field": {"group": "width"}, "mult": 1},
           "height": {"field": {"group": "height"}, "mult": 1},
           "clip": { "value": true }
-        }
-      },
+        }},
+        
+       "title": {
+    "text": "Your Title Here",
+    "anchor": "start",
+    "fontSize": 20,
+    "font": "sans-serif",
+    "color": "black",
+    "offset": 10
+  },
       "marks": [
         {
           "name": "water",
@@ -710,8 +718,8 @@
                   "fill": {"value": "#333"}
                 },
                 "update": {
-                  "x": {"scale": "xscale", "signal": "tooltip.count", "offset": 5},
-                  "y": {"scale": "yscale", "signal": "tooltip.Manufacturer", "band":0.9},
+                  "x": {"scale": "xscale", "signal": "tooltip.count", "offset": 20},
+                  "y": {"scale": "yscale", "signal": "tooltip.Manufacturer", "band": 0.5},
                   "text": {"signal": "tooltip.count"},
                   "fillOpacity": [
                     {"test": "isNaN(tooltip.count)", "value": 0},
@@ -891,6 +899,25 @@
       },
       "type": "group",
       "marks": [
+        {"type": "arc",
+          "from": {"data": "finalRadial"},
+          "encode": {
+            "tooltip": {"content": "value"},
+            "enter": {
+              "fill": {"value": "grey"},
+              "x": {"field": {"group": "width"}, "mult": 0.5},
+              "y": {"field": {"group": "height"}, "mult": 0.5},
+              "stroke": {"value": "silver"},
+              "fillOpacity": {"signal": "((datum.startAngle + datum.endAngle)/2 * 57.2957795) < 90 || ((datum.startAngle + datum.endAngle)/2 * 57.2957795) > 270 ? 0.3 :0"}, 
+            },
+            "update": {
+              "startAngle": {"field": "startAngle"},
+              "endAngle": {"field": "endAngle"},
+              "innerRadius": {"value": 10},
+              "outerRadius": {"scale": "r", "field": "maxDist"}
+            }
+          }
+        },
         {"name": "timeInterval",
           "type": "arc",
           "from": {"data": "finalRadial"},
@@ -942,24 +969,6 @@
             }
           }
         },
-        {"type": "arc",
-          "from": {"data": "finalRadial"},
-          "encode": {
-            "tooltip": {"content": "value"},
-            "enter": {
-              "x": {"field": {"group": "width"}, "mult": 0.5},
-              "y": {"field": {"group": "height"}, "mult": 0.5},
-              "stroke": {"value": "silver"},
-              "fillOpacity": {"value": 0}
-            },
-            "update": {
-              "startAngle": {"field": "startAngle"},
-              "endAngle": {"field": "endAngle"},
-              "innerRadius": {"value": 10},
-              "outerRadius": {"scale": "r", "field": "maxDist"}
-            }
-          }
-        },
        {"type": "text",
           "from": {"data": "finalRadial"},
           "encode": {
@@ -968,14 +977,16 @@
               "y": {"field": {"group": "height"}, "mult": 0.5}
               },
               "update": {
-              "radius": {"scale": "r", "field": "maxDist", "offset": 20},
+              "radius": {"scale": "r", "field": "maxDist",
+               "offset": {"signal": "datum.count === datum.maxDist ? 25 : 20"}},
               "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
               "fill": {"value": "#000"},
               "align": {"value": "center"},
               "angle": {"signal": "(((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90) < 270 ? (((datum.startAngle + datum.endAngle)/2 * 57.2957795) - 90) : (((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90)"}, 
               "baseline": {"value": "middle"},
               "text": {"field": "Time"},
-              "fontSize" : {"value": 12}
+              "fontSize" : {"signal": "datum.count === datum.maxDist ? 17 : 12"},
+              "fontWeight": {"signal": "datum.count === datum.maxDist ? 'bold' : 'normal'"}
             }
           }
         }
