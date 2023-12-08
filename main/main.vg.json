@@ -400,6 +400,8 @@
         }
       ]
     },
+
+    
     {"name": "finalRadial",
     "values": [
      {"Time": "00-01", "count":0},
@@ -458,7 +460,16 @@
         {"type": "fold", "fields": ["25","50","75"]},
         {"type": "pie"}
       ] 
-    }    
+    },
+    {"name": "crashesForAreaChart",
+      "source": "brushedCrashes",
+      "transform": [
+       {"type": "filter", "expr": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))"},
+       {"type": "aggregate",
+        "groupby": ["Year"]
+        },
+      ]
+    },    
   ],
   "scales": [
     {"name": "fatalitySize",
