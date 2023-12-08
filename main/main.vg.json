@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "padding": 5,
   "width": 1000,
@@ -25,6 +26,82 @@
     {
       "name": "tooltip",
       "value": {},
+=======
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "padding": 5,
+    "width": 1000,
+    "height": 700,
+    "autosize": "pad",
+    "layout": {"padding":5, "rows": 3, "columns": 2, "align": "center"},
+    "title": {
+      "text": "Visualizing Airplane Crashes",
+      "subtitle": "by Søren, Rasmus, Peter and Jonas",
+      "subtitleFontSize": 20,
+      "color": "#005ca5",
+      "fontSize": 32,
+      "dy": 0,
+      "fontWeight": "bold"
+    },
+    "signals": [
+      { "name": "mapWidth", "value": 600 },
+      { "name": "mapHeight", "value": 400 },
+      { "name": "histWidth", "value": 600 },
+      { "name": "histHeight", "value": 400 },
+      { "name": "selectionWidth", "value": 300 },
+      { "name": "selectionHeight", "value": 20 },
+  
+      {
+        "name": "tooltip",
+        "value": {},
+        "on": [
+          {"events": "rect:mouseover", "update": "datum"},
+          {"events": "rect:mouseout",  "update": "{}"}
+        ]
+      },
+      {
+        "name": "selected",
+        "value": false,
+        "on": [
+          {"events": "rect:mouseover", "update": "datum.Manufacturer"},
+          {"events": "rect:mouseout",  "update": "false"},
+          {"events": "arc:mouseover", "update": "datum.Time"},
+          {"events": "arc:mouseout",  "update": "false"}
+          
+        ]
+      },
+      {"name": "fatalityMin", "value": 0},
+      {"name": "fatalityMax", "value": 600},
+      { "name": "fatalityExtent", "init": "[fatalityMin, fatalityMax]" },
+  
+      {"name": "yearMin", "value": 1908},
+      {"name": "yearMax", "value": 2023},
+      { "name": "yearExtent", "init": "[yearMin, yearMax]"},
+  
+      {"name": "fatalityBrush", 
+      "update": "fatalityExtent",
+          "on": [
+            {
+              "events": "[@fatalitySelection:mousedown, window:mouseup] > window:mousemove!, [@fatalityBackground:mousedown, window:mouseup] > window:mousemove!",
+              "update": 
+              "[clamp(min(fatalityAnchor, invert('fatalityScale', x())),fatalityMin,fatalityMax), clamp(max(fatalityAnchor, invert('fatalityScale', x())),fatalityMin,fatalityMax)]"
+            },
+            {
+              "events": "[@fatalityX1:mousedown, window:mouseup] > window:mousemove!",
+              "update": "[clamp(min(fatalityBrush[1], invert('fatalityScale', x())),fatalityMin,fatalityMax), fatalityBrush[1]]"
+            },
+            {
+              "events": "[@fatalityX2:mousedown, window:mouseup] > window:mousemove!",
+              "update": "[fatalityBrush[0], clamp(max(fatalityBrush[0], invert('fatalityScale', x())),fatalityMin,fatalityMax)]"
+            },
+            {
+              "events": "@fatalityX1:dblclick, @fatalityX2:dblclick",
+              "update": "[fatalityExtent[0], fatalityExtent[1]]"
+            }
+          ]
+      },
+      {"name": "yearBrush",
+      "update": "yearExtent",
+>>>>>>> Stashed changes
       "on": [
         {"events": "rect:mouseover", "update": "datum"},
         {"events": "rect:mouseout",  "update": "{}"}
@@ -291,6 +368,7 @@
         {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
         {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
         ]
+<<<<<<< Updated upstream
     },
     {"name": "selectedManufacturers",
       "on": [
@@ -311,6 +389,77 @@
       "transform": [
         {"type": "filter", "expr": "(areWeBrushing == true && datum.x >=brushX[0] && datum.x <= brushX[1]) || areWeBrushing == false"},
         {"type": "filter", "expr": "(areWeBrushing == true && datum.y >= brushY[0] && datum.y <= brushY[1]) || areWeBrushing == false"}
+=======
+      },
+      {"name": "sphere",
+        "values": [{"type": "Sphere"}]
+      },
+      {"name": "crashes",
+        "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV4.csv",
+        "format": {"type": "csv", "parse": "auto"},
+        "transform": [
+          {
+            "type": "geopoint",
+            "projection": "projection",
+            "fields": ["Longitude", "Latitude"]
+          },
+          {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
+          {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
+          {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"},
+          {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
+          {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
+          ]
+      },
+      {
+        "name": "brushedCrashes",
+        "source": "crashes",
+        "transform": [
+          {"type": "filter", "expr": "datum.x >= brushX[0] && datum.x <= brushX[1]"},
+          {"type": "filter", "expr": "datum.y >= brushY[0] && datum.y <= brushY[1]"}
+          ]
+      },
+      {
+        "name": "brushedAndFilteredCrashes",
+        "source": "brushedCrashes",
+        "transform": [
+          {"type": "filter", "expr": "datum.Manufacturer == selected"}
+          ]
+      },
+      {
+        "name": "brushedAndFilteredByRadialCrashes",
+        "source": "brushedCrashes",
+        "transform": [
+          {"type": "filter", "expr": "datum.Time == selected"}
+          ]
+      },
+  
+  
+      {
+        "name": "aggregatedBrushedCrashes",
+        "source": "brushedCrashes",
+        "transform": [
+          {
+          "type": "aggregate",
+          "groupby": ["Manufacturer"]
+          },
+          {
+            "type": "collect",
+            "sort": {"order":"descending", "field": "count"}
+          },
+          {
+            "type": "window",
+            "sort": {"field": "count", "order":"descending"},
+            "ops": ["row_number"], "as": ["rank"]
+          },
+          {
+            "type": "filter",
+            "expr": "datum.rank <= 10"
+          },
+          {
+            "type": "collect",
+            "sort": {"order":"descending", "field": "count"}
+          }
+>>>>>>> Stashed changes
         ]
         
     },
@@ -481,6 +630,7 @@
       "type": "linear",
       "round": true,
       "range": [0, {"signal": "selectionWidth"}],
+<<<<<<< Updated upstream
       "domain": {"signal": "fatalityExtent"}
     },
     {"name": "yearScale",
@@ -550,6 +700,370 @@
           "name": "water",
           "type": "shape",
           "from": {"data": "sphere"},
+=======
+      "domain": {"signal": "yearExtent"}
+      },
+      {
+        "name": "yscale",
+        "type": "band",
+        "domain": {"data": "aggregatedBrushedCrashes", "field": "Manufacturer"},
+        "range":  [0, {"signal": "histHeight"}],
+        "padding": 0.1,
+        "round": true
+      },
+      {
+        "name": "xscale",
+        "domain": {"data": "aggregatedBrushedCrashes", "field": "count"},
+        "nice": true,
+        "range":  [0, {"signal": "histWidth"}],
+        "padding": 0.05,
+        "round": true
+      },
+      {"name": "r",
+        "type": "linear",
+        "domain": {"data": "timeAggregatedBrushedCrashes", "field": "count"},
+        "zero": true,
+        "range": [20, 130]
+      }
+    ],
+    "projections": [
+      {"name": "projection",
+        "type": "mercator",
+        "scale": { "signal": "scroll" },
+        "rotate": [{ "signal": "rotateX" }, 0, 0],
+        "center": [0, { "signal": "centerY" }],
+        "translate": [{ "signal": "width / 2" }, { "signal": "height / 2" }]
+      }
+    ],
+    "marks": [
+      {"name": "interactiveMap",
+        "type": "group",
+        "encode": {
+          "enter": {
+            "width": { "signal": "mapWidth" },
+            "height": { "signal": "mapHeight" },
+            "clip": { "value": true }
+          }
+        },
+        "marks": [
+          {
+            "name": "water",
+            "type": "shape",
+            "from": {"data": "sphere"},
+            "encode": {
+              "enter": {
+                "fill": {"value": "aliceblue"}
+              }
+            },
+            "transform": [
+              { "type": "geoshape", "projection": "projection" }
+            ]
+          },
+          {
+            "name": "land",
+            "type": "path",
+            "from": { "data": "world" },
+            "encode": {
+              "enter": {
+                "fill": { "value": "#dedede" },
+                "stroke": { "value": "white" }
+              },
+              "update": {
+                "path": { "field": "path" }
+              }
+            }
+          },
+          {
+            "name": "point",
+            "type": "symbol",
+            "from": {"data": "crashes"},
+            "encode": {
+              "enter": {
+                "size": {"scale": "fatalitySize", "field": "Fatalities"}, 
+                "shape": {"value": "circle"},
+                "fill": {"value": "steelblue"},
+                "fillOpacity": {"value": 0.8},
+                "stroke": {"value": "white"},
+                "strokeWidth": {"value": 1.5},
+                "tooltip": {"signal": "{title: 'Location of crash: ' + datum.Location, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities, 'Year': datum.Year, 'Summary': datum.Summary}"}
+              },
+              "update": {
+                "x": {"field": "x"},
+                "y": {"field": "y"},
+                "fill": [
+                  {
+                    "test": "indata('brushedAndFilteredCrashes', 'X', datum.X) || indata('brushedAndFilteredByRadialCrashes', 'X', datum.X)",
+                    "value": "red"
+                  },
+                  {
+                    "test": "indata('brushedCrashes', 'X', datum.X) && !indata('brushedAndFilteredCrashes', 'X', datum.X) && !indata('brushedAndFilteredByRadialCrashes', 'X', datum.X) || brushX[0]==0",
+                    "value": "steelblue"
+                  },
+                  {"value": "silver"}
+                ]
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }               
+            }
+          }
+        ]
+      },
+      
+      {"name": "yo",
+        "type": "rect",
+        "encode": {
+          "enter": {
+            "fill": {"value": "#eee"}
+          },
+          "update": {
+            "opacity": {"value": 0.4},
+            "x": {"signal": "brushX[0]"},
+            "x2": {"signal": "brushX[1]"},
+            "y": {"signal": "brushY[0]"},
+            "y2": {"signal": "brushY[1]"}
+          }
+        }
+      },
+      {"name": "histogram",
+        "type": "group",
+        "axes": [
+          { "orient": "top", "scale": "xscale" },
+          { "orient": "left", "scale": "yscale" }
+  
+          ],
+        "marks": [
+              {
+                "type": "rect",
+                "from": {"data":"aggregatedBrushedCrashes"},
+                "encode": {
+                  "enter": {
+                  },
+                  "update": {
+                    "y": {"scale": "yscale", "field": "Manufacturer"},
+                   "height": {"scale": "yscale", "band": 1},
+                    "width": {"scale": "yscale", "band": 1},
+                    "x": {"scale": "xscale", "field": "count"},
+                    "x2": {"scale": "xscale", "value": 0},
+                    "fill": {"value": "steelblue"}
+                  },
+                  "hover": {
+                    "fill": {"value": "red"}
+                  }
+                }
+              },
+              {
+                "type": "text",
+                "encode": {
+                  "enter": {
+                    "align": {"value": "center"},
+                    "baseline": {"value": "bottom"},
+                    "fill": {"value": "#333"}
+                  },
+                  "update": {
+                    "x": {"scale": "xscale", "signal": "tooltip.count", "offset": 5},
+                    "y": {"scale": "yscale", "signal": "tooltip.Manufacturer", "band":0.9},
+                    "text": {"signal": "tooltip.count"},
+                    "fillOpacity": [
+                      {"test": "isNaN(tooltip.count)", "value": 0},
+                      {"value": 1}
+                    ]
+                  }
+                }
+              }
+        ]
+      },
+      {"name": "selectionBarFatalities",
+        "type": "group",
+        "signals": [
+          { "name": "width", "update": "selectionWidth" },
+          { "name": "height", "update": "selectionHeight" }
+        ],
+        "encode": {
+          "update": {
+            "width": { "signal": "selectionWidth" },
+            "height": { "signal": "selectionHeight" }
+          }
+        },
+        "axes": [
+          { "orient": "bottom", "scale": "fatalityScale", "format": "d" }
+        ],
+        "marks": [
+          {
+            "type": "rect",
+            "name": "fatalityBackground",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+                "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#ececec"},
+                "cornerRadius": {"value": 60}
+              }
+            }
+          },
+          {
+            "type": "rect",
+            "name": "fatalitySelection",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+                "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#0671ed"},
+                "cornerRadius": {"value": 60}
+              },
+              "update": {
+                "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"},
+                "x2": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "fatalityX1",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "fatalityX2",
+            "encode": {
+              "enter": {
+                "x": {"scale": "fatalityScale", "signal": "fatalityMax"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
+              }
+            }
+          }
+        ]
+      },
+      {"name": "paddingOfGridLayout",
+        "type": "group"},
+      {"name": "selectionBarYear",
+        "type": "group",
+        "signals": [
+          { "name": "width", "update": "selectionWidth" },
+          { "name": "height", "update": "selectionHeight" }
+        ],
+        "encode": {
+          "update": {
+            "width": { "signal": "selectionWidth" },
+            "height": { "signal": "selectionHeight" }
+          }
+        },
+        "axes": [
+          {"orient": "bottom", "scale": "yearScale", "format": "d", "tickCount": 15}
+        ],
+        "marks": [
+          {
+            "type": "rect",
+            "name": "yearBackground",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMin"},
+                "x2": {"scale": "yearScale", "signal": "yearMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#ececec"},
+                "cornerRadius": {"value": 60}
+              }
+            }
+          },
+          {
+            "type": "rect",
+            "name": "yearSelection",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMin"},
+                "x2": {"scale": "yearScale", "signal": "yearMax"},
+                "y": {"value": 16},
+                "height": {"value": 8},
+                "fill": {"value": "#0671ed"},
+                "cornerRadius": {"value": 60}
+              },
+              "update": {
+                "x": {"signal": "scale('yearScale', yearBrush[0])"},
+                "x2": {"signal": "scale('yearScale', yearBrush[1])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "yearX1",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMin"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('yearScale', yearBrush[0])"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "name": "yearX2",
+            "encode": {
+              "enter": {
+                "x": {"scale": "yearScale", "signal": "yearMax"},
+                "y": {"value": 20},
+                "size": {"value": 300},
+                "fill": {"value": "#0671ed"}
+              },
+              "update": {
+                "x": {"signal": "scale('yearScale', yearBrush[1])"}
+              }
+            }
+          }
+        ]
+      },
+        {"name": "radial",
+        "type": "group",
+        "marks": [
+          {"type": "arc",
+          
+            "from": {"data": "timeAggregatedBrushedCrashes"},
+            "encode": {
+              "tooltip": {"content": "value"},
+              "enter": {
+                "x": {"field": {"group": "width"}, "mult": 0.5},
+                "y": {"field": {"group": "height"}, "mult": 0.5}
+              },
+              "update": {
+                "tooltip": {"signal": "{'Plane crashes': datum.count}"},
+                "startAngle": {"field": "startAngle"},
+                "endAngle": {"field": "endAngle"},
+                "innerRadius": {"value": 10},
+                "outerRadius": {"scale": "r", "field": "count"},
+                "padAngle": {"value": 0.01},
+              "fill": {"value": "steelblue"}
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }
+            }
+          },
+          {"type": "arc",
+          "from": {"data": "circles"},
+>>>>>>> Stashed changes
           "encode": {
             "enter": {
               "fill": {"value": "aliceblue"}
