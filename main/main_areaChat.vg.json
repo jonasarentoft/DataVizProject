@@ -609,7 +609,7 @@
             "enter": {
               "size": {"scale": "fatalitySize", "field": "Fatalities"}, 
               "shape": {"value": "circle"},
-              "fill": {"value": "steelblue"},
+              "fill": {"value": "#005ca5"},
               "fillOpacity": {"value": 0.8},
               "stroke": {"value": "white"},
               "strokeWidth": {"value": 1.5}
@@ -631,7 +631,7 @@
                 },
                 {
                   "test": "indata('brushedCrashes', 'X', datum.X) && !indata('brushedAndFilteredCrashes', 'X', datum.X) || brushX[0]==0",
-                  "value": "steelblue"
+                  "value": "#005ca5"
                 },
                 {"value": "silver"}
               ],
@@ -716,7 +716,7 @@
                   "fill": [
                     {
                       "test": "!length(data('selectedManufacturers'))",
-                      "value": "steelblue"
+                      "value": "#005ca5"
                     },
                     {
                       "test": "indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer)",
@@ -763,7 +763,7 @@
       "from": {"data": "crashesForAreaChart"},
       "encode": {
         "enter": {
-          "fill": {"value": "steelblue"}
+          "fill": {"value": "#005ca5"}
         },
         "update": {
           "x": {"scale": "yearScaleForTimeLine", "field": "Year"},
@@ -771,7 +771,9 @@
           "y2": {"scale": "countScaleForTimeLine", "value": 0},
           "interpolate": {"value": "basis"},
           "fillOpacity": {"value": 1},
-          "defined": {"value": true}
+          "defined": {"value": true},
+                        "tooltip": {"signal": "{'Year': datum.Year, 'Number of crashes': datum.count}"},
+
         },
         "hover": {
           "fillOpacity": {"value": 0.5}
@@ -826,7 +828,7 @@
               "fill": [
                     {
                       "test": "!length(data('selectedTimeIntervals'))",
-                      "value": "steelblue"
+                      "value": "#005ca5"
                     },
                     {
                       "test": "indata('selectedTimeIntervals', 'Time', datum.Time)",
@@ -902,7 +904,7 @@
           "encode": {
                 "enter": {
                   "fill": {"value": "black"},
-                  "x": {"value": 150},
+                  "xc": {"signal": "selectionWidth/2"},
                   "y": {"value": 10},
                   "fontSize": {"value": 16},
                   "align": {"value": "center"},
@@ -934,7 +936,7 @@
               "x2": {"scale": "fatalityScale", "signal": "fatalityMax"},
               "y": {"value": 16},
               "height": {"value": 8},
-              "fill": {"value": "#0671ed"},
+              "fill": {"value": "#005ca5"},
               "cornerRadius": {"value": 60}
             },
             "update": {
@@ -951,7 +953,7 @@
               "x": {"scale": "fatalityScale", "signal": "fatalityMin"},
               "y": {"value": 20},
               "size": {"value": 300},
-              "fill": {"value": "#0671ed"}
+              "fill": {"value": "#005ca5"}
             },
             "update": {
               "x": {"signal": "scale('fatalityScale', fatalityBrush[0])"}
@@ -966,7 +968,7 @@
               "x": {"scale": "fatalityScale", "signal": "fatalityMax"},
               "y": {"value": 20},
               "size": {"value": 300},
-              "fill": {"value": "#0671ed"}
+              "fill": {"value": "#005ca5"}
             },
             "update": {
               "x": {"signal": "scale('fatalityScale', fatalityBrush[1])"}
@@ -998,7 +1000,7 @@
           "encode": {
                 "enter": {
                   "fill": {"value": "black"},
-                  "x": {"value": 150},
+                  "x": {"signal": "selectionWidth/2"},
                   "y": {"value": 10},
                   "align": {"value": "center"},
                   "fontSize": {"value": 16},
@@ -1030,7 +1032,7 @@
               "x2": {"scale": "yearScale", "signal": "yearMax"},
               "y": {"value": 16},
               "height": {"value": 8},
-              "fill": {"value": "#0671ed"},
+              "fill": {"value": "#005ca5"},
               "cornerRadius": {"value": 60}
             },
             "update": {
@@ -1047,7 +1049,7 @@
               "x": {"scale": "yearScale", "signal": "yearMin"},
               "y": {"value": 20},
               "size": {"value": 300},
-              "fill": {"value": "#0671ed"}
+              "fill": {"value": "#005ca5"}
             },
             "update": {
               "x": {"signal": "scale('yearScale', yearBrush[0])"}
@@ -1062,7 +1064,7 @@
               "x": {"scale": "yearScale", "signal": "yearMax"},
               "y": {"value": 20},
               "size": {"value": 300},
-              "fill": {"value": "#0671ed"}
+              "fill": {"value": "#005ca5"}
             },
             "update": {
               "x": {"signal": "scale('yearScale', yearBrush[1])"}
