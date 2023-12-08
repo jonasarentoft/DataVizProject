@@ -331,22 +331,19 @@
         ]
         
     },
-    {
-      "name": "brushedAndFilteredCrashes",
+    {"name": "brushedAndFilteredCrashes",
       "source": "brushedCrashes",
       "transform": [
         {"type": "filter", "expr": "datum.Manufacturer == hoveredManufacturer || datum.Time == hoveredTime"}
         ]
     },
-    {
-      "name": "brushedAndTimeFilteredCrashes",
+    {"name": "brushedAndTimeFilteredCrashes",
       "source": "brushedCrashes",
       "transform": [
         {"type": "filter", "expr": "datum.Time == hoveredTime"}
         ]
     },
-    {
-      "name": "aggregatedBrushedCrashes",
+    {"name": "aggregatedBrushedCrashes",
       "source": "brushedCrashes",
       "transform": [
         {
@@ -372,8 +369,7 @@
         }
       ]
     },
-    {
-      "name": "aggregatedCrashes",
+    {"name": "aggregatedCrashes",
       "source": "crashes",
       "transform": [
         {
@@ -421,8 +417,7 @@
         }
       ]
     },
-              {
-    "name": "finalRadial",
+    {"name": "finalRadial",
     "values": [
      {"Time": "00-01"},
       {"Time": "01-02"},
@@ -449,7 +444,7 @@
       {"Time": "22-23"},
       {"Time": "23-00"}
     ],
-          "transform": [
+      "transform": [
         {
         "type": "lookup",
         "from": "timeAggregatedBrushedCrashes",
@@ -458,7 +453,13 @@
         "values": ["count"],
         "as": ["count"],
         "default": 0
-      }
+      },
+      {"type": "joinaggregate",
+        "fields": ["count"],
+        "ops": ["max"],
+        "as": ["maxDist"]
+      },
+      {"type": "pie"}
       ]},
       {"name": "circles",
       "source": "timeAggregatedBrushedCrashes",
@@ -472,7 +473,7 @@
         {"type": "formula", "as": "50", "expr": "datum.max_count*0.5"},
         {"type": "formula", "as": "75", "expr": "datum.max_count*0.75"},
         {"type": "fold", "fields": ["25","50","75"]},
-        {"type": "pie"},
+        {"type": "pie"}
       ] 
     }    
   ],
@@ -515,7 +516,7 @@
       "type": "linear",
       "domain": {"data": "timeAggregatedBrushedCrashes", "field": "count"},
       "zero": true,
-      "range": [20, 130]
+      "range": [10, 130]
     }
   ],
   "projections": [
@@ -870,12 +871,12 @@
       "marks": [
         {"name": "timeInterval",
           "type": "arc",
-          "from": {"data": "timeAggregatedBrushedCrashes"},
+          "from": {"data": "finalRadial"},
           "encode": {
             "tooltip": {"content": "value"},
             "enter": {
-              "x": {"field": {"group": "width"}, "mult": 0.5},
-              "y": {"field": {"group": "height"}, "mult": 0.5}
+              "x": {"field": {"group": "width"}},
+              "y": {"field": {"group": "height"}}
             },
             "update": {
               "tooltip": {"signal": "{'Plane crashes': datum.count}"},
@@ -920,7 +921,7 @@
           }
         },
         {"type": "arc",
-          "from": {"data": "timeAggregatedBrushedCrashes"},
+          "from": {"data": "finalRadial"},
           "encode": {
             "tooltip": {"content": "value"},
             "enter": {
@@ -938,7 +939,7 @@
           }
         },
        {"type": "text",
-          "from": {"data": "timeAggregatedBrushedCrashes"},
+          "from": {"data": "finalRadial"},
           "encode": {
             "enter": {
               "x": {"field": {"group": "width"}, "mult": 0.5},
