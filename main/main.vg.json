@@ -256,26 +256,6 @@
           "update": "clamp(angles[1] + delta[1], -60, 60)"
         }
       ]
-    },
-    {"name": "selectManufacturer",
-      "value": "All",
-      "bind": {
-        "name": "Select Manufacturer",
-        "input": "select",
-        "options": [
-          "All", "Airbus", "Antonov", "ATR", "Aero", "Aerospatiale", "Avia", "Avro",
-           "BAE", "BAC", "Beechcraft", "Bell", "Bleriot", "Boeing", "Breguet", "Bristol", 
-           "British", "Britten Norman", "CASA", "Canadair", "Cessna", "Consolidated", 
-           "Convair", "Curtiss", "Curtiss Wright", "Dassault", "Dewoitine", "Douglas", 
-           "Dornier", "Embraer", "Eurocopter", "Fairchild", "Fairchild Hiller", "Fokker", 
-           "Ford", "GAZ", "GAF", "Gates", "Grumman", "Handley Page", "Hawker Siddeley", 
-           "Heinkel", "IAI", "Ilyushin", "Junkers", "Latecoere", "Learjet", "Let", 
-           "Liore et Olivier", "Lockheed", "McDonnell Douglas", "Martin", "Mil", 
-           "Missing value", "NAMC", "Nord", "Pilatus", "Piper", "Rockwell", "Saab", 
-           "Savoia Marchetti", "Short", "Sikorsky", "Stearman", "Stinson", "Sud Aviation", 
-           "Swearingen", "Travel", "Tupolev", "Vickers", "Yakovlev", "Zeppelin", "Other"
-        ]
-      }
     }
   ],
   "data": [
@@ -294,7 +274,7 @@
       "values": [{"type": "Sphere"}]
     },
     {"name": "crashes",
-      "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV4.csv",
+      "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV7.csv",
       "format": {"type": "csv", "parse": "auto"},
       "transform": [
         {
@@ -304,7 +284,6 @@
         },
         {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
         {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
-        {"type": "filter", "expr": "( selectManufacturer == 'All' ) ? selectManufacturer != datum.Manufacturer : selectManufacturer == datum.Manufacturer"},
         {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
         {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
         ]
@@ -747,6 +726,20 @@
       ],
       "marks": [
         {
+          "type": "text",
+          "encode": {
+                "enter": {
+                  "fill": {"value": "black"},
+                  "x": {"value": 150},
+                  "y": {"value": 10},
+                  "fontSize": {"value": 16},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "alphabetic"},
+                  "text": {"value": "Select fatalities interval"}
+                }
+              }
+        },
+        {
           "type": "rect",
           "name": "fatalityBackground",
           "encode": {
@@ -829,6 +822,20 @@
       ],
       "marks": [
         {
+          "type": "text",
+          "encode": {
+                "enter": {
+                  "fill": {"value": "black"},
+                  "x": {"value": 150},
+                  "y": {"value": 10},
+                  "align": {"value": "center"},
+                  "fontSize": {"value": 16},
+                  "baseline": {"value": "alphabetic"},
+                  "text": {"value": "Select year interval"}
+                }
+              }
+        },
+        {
           "type": "rect",
           "name": "yearBackground",
           "encode": {
@@ -908,7 +915,7 @@
               "x": {"field": {"group": "width"}, "mult": 0.5},
               "y": {"field": {"group": "height"}, "mult": 0.5},
               "stroke": {"value": "silver"},
-              "fillOpacity": {"signal": "((datum.startAngle + datum.endAngle)/2 * 57.2957795) < 90 || ((datum.startAngle + datum.endAngle)/2 * 57.2957795) > 270 ? 0.3 :0"}, 
+              "fillOpacity": {"signal": "((datum.startAngle + datum.endAngle)/2 * 57.2957795) < 90 || ((datum.startAngle + datum.endAngle)/2 * 57.2957795) > 270 ? 0.3 :0"} 
             },
             "update": {
               "startAngle": {"field": "startAngle"},
