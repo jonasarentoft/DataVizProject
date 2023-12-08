@@ -278,6 +278,17 @@
       {"name": "sphere",
         "values": [{"type": "Sphere"}]
       },
+      {"name": "rawCrashes",
+        "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV8.csv",
+        "format": {"type": "csv", "parse": "auto"},
+        "transform": [
+          {
+            "type": "geopoint",
+            "projection": "projection",
+            "fields": ["Longitude", "Latitude"]
+          }
+          ]
+      },
       {"name": "crashes",
         "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV8.csv",
         "format": {"type": "csv", "parse": "auto"},
@@ -290,7 +301,7 @@
           {"type": "filter", "expr": "datum.Fatalities <= fatalityBrush[1]"},
           {"type": "filter", "expr": "datum.Fatalities >= fatalityBrush[0]"},
           {"type": "filter", "expr": "datum.Year <= yearBrush[1]"},
-          {"type": "filter", "expr": "datum.Year >= yearBrush[0]"}        
+          {"type": "filter", "expr": "datum.Year > yearBrush[0]"}        
           ]
       },
       {"name": "selectedManufacturers",
@@ -463,12 +474,13 @@
         ] 
       },
       {"name": "crashesForAreaChart",
-        "source": "brushedCrashes",
+        "source": "rawCrashes",
         "transform": [
-         {"type": "filter", "expr": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))"},
          {"type": "aggregate",
           "groupby": ["Year"]
-          }
+          },
+        {"type": "collect",
+        "sort": {"order":"ascending", "field": "Year"}}
         ]
       }
     ],
@@ -492,7 +504,7 @@
         "domain": {"signal": "yearExtent"}
       },
       {"name": "yearScaleForTimeLine",
-        "type": "linear",
+        "type": "",
         "round": true,
         "zero": false,
         "range": "width",
@@ -500,6 +512,7 @@
       },
       {"name": "countScaleForTimeLine",
         "domain": {"signal": "countGroupedByYearExtent"},
+        "type": "linear",
         "nice": true,
         "range":  [100, 0],
         "round": true
@@ -1040,14 +1053,15 @@
         "from": {"data": "crashesForAreaChart"},
         "encode": {
           "enter": {
-            "x": {"scale": "yearScaleForTimeLine", "field": "Year"},
-            "y": {"scale": "countScaleForTimeLine", "field": "count"},
-            "y2": {"scale": "countScaleForTimeLine", "value": 0},
             "fill": {"value": "steelblue"}
           },
           "update": {
+            "x": {"scale": "yearScaleForTimeLine", "field": "Year"},
+            "y": {"scale": "countScaleForTimeLine", "field": "count"},
+            "y2": {"scale": "countScaleForTimeLine", "value": 0},
             "interpolate": {"value": "basis"},
-            "fillOpacity": {"value": 1}
+            "fillOpacity": {"value": 1},
+            "defined": {"value": true}
           },
           "hover": {
             "fillOpacity": {"value": 0.5}
