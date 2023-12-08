@@ -19,7 +19,7 @@
     { "name": "mapHeight", "value": 700 },
     { "name": "histWidth", "value": 600 },
     { "name": "histHeight", "value": 700 },
-    { "name": "selectionWidth", "value": 900 },
+    { "name": "selectionWidth", "value": 500 },
     { "name": "selectionHeight", "value": 20 },
 
     {
@@ -493,14 +493,14 @@
     {"name": "fatalityScale",
       "type": "linear",
       "round": true,
-      "range": [0, {"signal": "selectionWidth"}],
+      "range": [200, {"signal": "selectionWidth+200"}],
       "domain": {"signal": "fatalityExtent"}
     },
     {"name": "yearScale",
       "type": "linear",
       "round": true,
       "zero": false,
-      "range": [0, {"signal": "selectionWidth"}],
+      "range": [200, {"signal": "selectionWidth+200" }],
       "domain": {"signal": "yearExtent"}
     },
     {"name": "yearScaleForTimeLine",
@@ -904,12 +904,13 @@
           "encode": {
                 "enter": {
                   "fill": {"value": "black"},
-                  "xc": {"signal": "selectionWidth/2"},
+                  "xc": {"signal": "selectionWidth/2 + 200"},
                   "y": {"value": 10},
-                  "fontSize": {"value": 16},
+                  "fontSize": {"value": 15},
+                  "fontStyle": {"value": "bold"},
                   "align": {"value": "center"},
                   "baseline": {"value": "alphabetic"},
-                  "text": {"value": "Select fatalities interval"}
+                  "text": {"value": "Select Fatalities Interval"}
                 }
               }
         },
@@ -1000,12 +1001,13 @@
           "encode": {
                 "enter": {
                   "fill": {"value": "black"},
-                  "x": {"signal": "selectionWidth/2"},
+                  "x": {"signal": "selectionWidth/2 + 200"},
                   "y": {"value": 10},
                   "align": {"value": "center"},
-                  "fontSize": {"value": 16},
+                  "fontSize": {"value": 15},
                   "baseline": {"value": "alphabetic"},
-                  "text": {"value": "Select year interval"}
+                  "text": {"value": "Select Year Interval"},
+                  "fontStyle": {"value": "bold"}
                 }
               }
         },
