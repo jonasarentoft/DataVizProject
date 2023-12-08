@@ -158,7 +158,7 @@
     ]
     },
     {"name": "brushY",
-      "init": "[0, height]",
+      "init": "[0, 0]",
       "on": [
         {
           "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -167,6 +167,10 @@
         {
           "events": "[@land:mousedown[event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
           "update": "[brushY[0], clamp(y(), 0, height)]"
+        },
+        {
+          "events": [{"signal": "scroll"}, {"signal": "drag"}],
+          "update": "[0,0]"
         }
       ]
     },
@@ -274,7 +278,7 @@
       "values": [{"type": "Sphere"}]
     },
     {"name": "crashes",
-      "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV7.csv",
+      "url": "https://raw.githubusercontent.com/jonasarentoft/DataVizProject/main/data/plane_crash_coordinatesV8.csv",
       "format": {"type": "csv", "parse": "auto"},
       "transform": [
         {
@@ -530,15 +534,6 @@
           "height": {"field": {"group": "height"}, "mult": 1},
           "clip": { "value": true }
         }},
-        
-       "title": {
-    "text": "Your Title Here",
-    "anchor": "start",
-    "fontSize": 20,
-    "font": "sans-serif",
-    "color": "black",
-    "offset": 10
-  },
       "marks": [
         {
           "name": "water",
@@ -588,7 +583,8 @@
                 {
                   "test": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))",
                   "scale": "fatalitySize", "field": "Fatalities"
-                }
+                },
+                {"value": 0}
               ],
               "fill": [
                 {
@@ -618,13 +614,20 @@
               ],
               "tooltip": [
                 {
-                  "test": "(!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))",
+                  "test": "((!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))) && (indata('brushedAndFilteredCrashes', 'X', datum.X) || indata('brushedCrashes', 'X', datum.X) && !indata('brushedAndFilteredCrashes', 'X', datum.X) || brushX[0]==0) ",
                   "signal": "{title: 'Location of crash: ' + datum.Location, 'Time': datum.Time, 'Manufacturer': datum.Manufacturer, 'Fatalities': datum.Fatalities, 'Year': datum.Year, 'Summary': datum.Summary}"
-                }
+                },
+                {"signal": "null"}
               ]
             },
             "hover": {
-              "fill": {"value": "red"}
+              "fill": [
+                {
+                  "test": "((!length(data('selectedManufacturers')) && !length(data('selectedTimeIntervals'))) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && indata('selectedTimeIntervals', 'Time', datum.Time)) || (indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer) && !length(data('selectedTimeIntervals'))) || (!length(data('selectedManufacturers')) && indata('selectedTimeIntervals', 'Time', datum.Time))) && (indata('brushedAndFilteredCrashes', 'X', datum.X) || indata('brushedCrashes', 'X', datum.X) && !indata('brushedAndFilteredCrashes', 'X', datum.X) || brushX[0]==0) ",
+                  "value": "red"
+                },
+                {"value": "silver"}
+              ]
             }               
           }
         }
@@ -635,10 +638,11 @@
       "type": "rect",
       "encode": {
         "enter": {
-          "fill": {"value": "#eee"}
+          
         },
         "update": {
           "opacity": {"value": 0.4},
+          "stroke": {"value": "black"},
           "x": {"signal": "brushX[0]"},
           "x2": {"signal": "brushX[1]"},
           "y": {"signal": "brushY[0]"},
