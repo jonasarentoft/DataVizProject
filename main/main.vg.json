@@ -1,10 +1,10 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "padding": 5,
-  "width": 800,
+  "width": 1000,
   "height": 700,
   "autosize": "pad",
-  "layout": {"padding":5, "rows": 3, "columns": 2, "align": "center"},
+  "layout": {"padding": 1, "rows": 3, "columns": 2, "align": "center"},
   "title": {
     "text": "Visualizing Airplane Crashes",
     "subtitle": "by Søren, Rasmus, Peter and Jonas",
@@ -16,9 +16,9 @@
   },
   "signals": [
     { "name": "mapWidth", "value": 800 },
-    { "name": "mapHeight", "value": 400 },
+    { "name": "mapHeight", "value": 700 },
     { "name": "histWidth", "value": 600 },
-    { "name": "histHeight", "value": 400 },
+    { "name": "histHeight", "value": 700 },
     { "name": "selectionWidth", "value": 300 },
     { "name": "selectionHeight", "value": 20 },
 
@@ -158,7 +158,7 @@
     ]
     },
     {"name": "brushY",
-      "init": "[0, mapHeight]",
+      "init": "[0, height]",
       "on": [
         {
           "events": "@land:mousedown[event.shiftKey], @water:mousedown[event.shiftKey]",
@@ -361,7 +361,7 @@
         },
         {
           "type": "filter",
-          "expr": "datum.rank <= 10"
+          "expr": "datum.rank <= 20"
         },
         {
           "type": "collect",
@@ -529,12 +529,26 @@
     }
   ],
   "marks": [
+    {
+      "type": "text",
+      "encode": {
+            "enter": {
+              "fill": {"value": "black"},
+              "x": {"signal": "width/2-100"},
+              "y": {"value": -10},
+              "fontSize": {"value": 16},
+              "baseline": {"value": "bottom"},
+              "fontWeight": {"value": "bold"},
+              "text": {"value": "Map of airplane crashes"}
+            }
+          }
+    },
     {"name": "interactiveMap",
       "type": "group",
       "encode": {
         "enter": {
-          "width": { "signal": "mapWidth" },
-          "height": { "signal": "mapHeight" },
+          "width": {"field": {"group": "width"}, "mult": 1},
+          "height": {"field": {"group": "height"}, "mult": 1},
           "clip": { "value": true }
         }
       },
@@ -646,6 +660,10 @@
       }
     },
     {"name": "histogram",
+      "title": {
+        "text": "Airplane crashes by manufacturer (top 20)",
+        "fontSize": 16
+      },
       "type": "group",
       "axes": [
         { "orient": "top", "scale": "xscale" },
@@ -867,6 +885,10 @@
       ]
     },
     {"name": "radial",
+      "title": {
+        "text": "Airplane crashes by time of day",
+        "fontSize": 16
+      },
       "type": "group",
       "marks": [
         {"name": "timeInterval",
