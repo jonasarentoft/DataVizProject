@@ -15,7 +15,7 @@
       "fontWeight": "bold"
     },
     "signals": [
-        {"name": "detailDomain", "init": "[yearMin, yearMax]"},
+      {"name": "detailDomain", "init": "[yearMin, yearMax]"},
       { "name": "mapWidth", "value": 900 },
       { "name": "mapHeight", "value": 700 },
       { "name": "histWidth", "value": 600 },
@@ -38,15 +38,6 @@
           {"events": "rect:mouseover", "update": "datum.Manufacturer"},
           {"events": "rect:mouseout",  "update": "false"}
         ]
-      },
-      {
-        "name": "yearselector",
-        "value": null,
-        "on": [
-          {"events": "@areaCheart:mousedown", "update": "datum.Year"},
-          {"events": "rect:mouseout",  "update": "false"}
-        ]
-  
       },
       {"name": "clickedManufacturer",
         "value": null,
@@ -240,12 +231,12 @@
         "value": null,
         "on": [
           {
-            "events": "[@land:mousedown[!event.shiftKey], window:mouseup] > window:mousemove, [@water:mousedown[!event.shiftKey], window:mouseup] > window:mousemove",
+            "events": "[@land:mousedown[!event.shiftKey], window:mouseup] > window:mousemove!, [@water:mousedown[!event.shiftKey], window:mouseup] > window:mousemove!",
             "update": "invert(cloned, xy())"
           }
         ]
       },
-      {"name": "delta",
+      {"name": "deltaA",
         "value": null,
         "on": [
           {
@@ -258,8 +249,8 @@
         "value": 0,
         "on": [
           {
-            "events": { "signal": "delta" },
-            "update": "angles[0] + delta[0]"
+            "events": { "signal": "deltaA" },
+            "update": "angles[0] + deltaA[0]"
           }
         ]
       },
@@ -267,8 +258,8 @@
         "value": 0,
         "on": [
           {
-            "events": { "signal": "delta" },
-            "update": "clamp(angles[1] + delta[1], -60, 60)"
+            "events": { "signal": "deltaA" },
+            "update": "clamp(angles[1] + deltaA[1], -60, 60)"
           }
         ]
       }
@@ -506,13 +497,6 @@
         "range": [200, {"signal": "selectionWidth+200"}],
         "domain": {"signal": "fatalityExtent"}
       },
-      {"name": "yearScale",
-        "type": "linear",
-        "round": true,
-        "zero": false,
-        "range": [200, {"signal": "selectionWidth+200" }],
-        "domain": {"signal": "yearExtent"}
-      },
       {"name": "yearScaleForTimeLine",
         "type": "",
         "round": true,
@@ -705,8 +689,8 @@
         },
         "type": "group",
         "axes": [
-          { "orient": "top", "scale": "xscale" },
-          { "orient": "left", "scale": "yscale" }
+          { "orient": "top", "scale": "xscale" , "title": "# of crashes"},
+          { "orient": "left", "scale": "yscale", "title": "Manufacturer" }
   
           ],
         "marks": [
@@ -761,142 +745,158 @@
               }
         ]
       },
-   {
-        "type": "group",
-        "name": "overview",
-        "encode": {
-          "enter": {
-            "x": {"value": 0},
-            "y": {"value": 430},
-            "height": {"value": 100},
-            "width": {"value": 720},
-            "fill": {"value": "transparent"}
-          }
-          
+{
+      "type": "group",
+      "name": "overview",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 430},
+          "height": {"value": 100},
+          "width": {"value": 720},
+          "fill": {"value": "transparent"}
+        }
+        
+      },
+
+      "scales": [
+        {
+          "name": "xOverview",
+          "type": "time",
+          "range": "width",
+          "domain": {"data": "crashesForAreaChart", "field": "Year"}
         },
-              "axes": [
+        {
+          "name": "yOverview",
+          "type": "linear",
+          "range": [100, 0],
+          "domain": {"data": "crashesForAreaChart", "field": "count"},
+          "nice": true, "zero": true
+        }
+      ],
+      "axes": [
           { "orient": "top", "scale": "yearScaleForTimeLine", "format": "d", "tickCount": 20, "title" : "Year" },
           { "orient": "left", "scale": "countScaleForTimeLine", "title": "# of crashes" }
-        ],
-        "signals": [
-          {
-            "name": "brushAreaChart", "value": 0,
-            "on": [
-              {
-                "events": "@overview:dblclick",
-                "update": {"value": 0}
-              },
-              {
-                "events": "@overview:pointerdown",
-                "update": "[x(), x()]"
-              },
-              {
-                "events": "[@overview:pointerdown, window:pointerup] > window:pointermove!",
-                "update": "[brushAreaChart[0], clamp(x(), 0, width)]"
-              },
-              {
-                "events": {"signal": "delta"},
-                "update": "clampRange([anchor[0] + delta, anchor[1] + delta], 0, width)"
-              }
-            ]
-          },
-          {
-            "name": "anchor", "value": null,
-            "on": [{"events": "@brushAreaChart:pointerdown", "update": "slice(brushAreaChart)"}]
-          },
-          {
-            "name": "xdown", "value": 0,
-            "on": [{"events": "@brushAreaChart:pointerdown", "update": "x()"}]
-          },
-          {
-            "name": "delta", "value": 0,
-            "on": [
-              {
-                "events": "[@brushAreaChart:pointerdown, window:pointerup] > window:pointermove!",
-                "update": "x() - xdown"
-              }
-            ]
-          },
-          {
-            "name": "detailDomain",
-            "push": "outer",
-            "on": [
-              {
-                "events": {"signal": "brushAreaChart"},
-                "update": "span(brushAreaChart) ? invert('yearScaleForTimeLine', brushAreaChart) : null"
-              }
-            ]
-          }
-        ],
-        "marks": [
-          {
-            "type": "area",
-            "interactive": false,
-            "from": {"data": "crashesForAreaChart"},
-            
-            "encode": {
-              "enter": {
-            "fill": {"value": "#005ca5"}
-          },
-              "update": {
-                "x": {"scale": "yearScaleForTimeLine", "field": "Year"},
-                "y": {"scale": "countScaleForTimeLine", "field": "count"},
-                "y2": {"scale": "countScaleForTimeLine", "value": 0},
-                "fillOpacity": {"value": 1},
-                "defined": {"value": true},
-                          "tooltip": {"signal": "{'Year': datum.Year, 'Number of crashes': datum.count}"},
-                "interpolate": {"value": "basis"}
-              }
+      ],
+      "signals": [
+        {
+          "name": "brush", "value": 0,
+          "on": [
+            {
+              "events": "@overview:dblclick",
+              "update": "[0,0]"
+            },
+            {
+              "events": "@overview:mousedown",
+              "update": "[x(), x()]"
+            },
+            {
+              "events": "[@overview:mousedown, window:mouseup] > window:mousemove!",
+              "update": "[brush[0], clamp(x(), 0, width)]"
+            },
+            {
+              "events": {"signal": "delta"},
+              "update": "clampRange([anchor[0] + delta, anchor[1] + delta], 0, width)"
             }
-          },
-          {
-            "type": "rect",
-            "name": "",
-            "encode": {
-              "enter": {
-                "y": {"value": 0},
-                "height": {"value": 100},
-                "fill": {"value": "#333"},
-                "fillOpacity": {"value": 0.2}
-              },
-              "update": {
-                "x": {"signal": "brushAreaChart[0]"},
-                "x2": {"signal": "brushAreaChart[1]"}
-              }
+          ]
+        },
+        {
+          "name": "anchor", "value": null,
+          "on": [{"events": "@brush:mousedown", "update": "slice(brush)"}]
+        },
+        {
+          "name": "xdown", "value": 0,
+          "on": [{"events": "@brush:mousedown", "update": "x()"}]
+        },
+        {
+          "name": "delta", "value": 0,
+          "on": [
+            {
+              "events": "[@brush:mousedown, window:mouseup] > window:mousemove!",
+              "update": "x() - xdown"
             }
-          },
-          {
-            "type": "rect",
-            "interactive": false,
-            "encode": {
-              "enter": {
-                "y": {"value": 0},
-                "height": {"value": 100},
-                "width": {"value": 1},
-                "fill": {"value": "firebrick"}
-              },
-              "update": {
-                "x": {"signal": "brushAreaChart[0]"}
-              }
+          ]
+        },
+        {
+          "name": "detailDomain",
+          "push": "outer",
+          "on": [
+            {
+              "events": {"signal": "brush"},
+              "update": "span(brush) ? invert('yearScaleForTimeLine', brush) : [1908,2023]"
             }
-          },
-          {
-            "type": "rect",
-            "interactive": false,
-            "encode": {
-              "enter": {
-                "y": {"value": 0},
-                "height": {"value": 100},
-                "width": {"value": 1},
-                "fill": {"value": "firebrick"}
-              },
-              "update": {
-                "x": {"signal": "brushAreaChart[1]"}
-              }
+          ]
+        }
+      ],
+      "marks": [
+        {
+          "type": "area",
+          "interactive": false,
+          "from": {"data": "crashesForAreaChart"},
+          
+          "encode": {
+            "enter": {
+          "fill": {"value": "#005ca5"}
+        },
+            "update": {
+              "x": {"scale": "xOverview", "field": "Year"},
+              "y": {"scale": "yOverview", "field": "count"},
+              "y2": {"scale": "yOverview", "value": 0},
+              "fillOpacity": {"value": 1},
+              "defined": {"value": true},
+                        "tooltip": {"signal": "{'Year': datum.Year, 'Number of crashes': datum.count}"},
+              "interpolate": {"value": "basis"}
             }
           }
-        ]
-      },
+        },
+        {
+          "type": "rect",
+          "name": "brush",
+          "encode": {
+            "enter": {
+              "y": {"value": 0},
+              "height": {"value": 100},
+              "fill": {"value": "#333"},
+              "fillOpacity": {"value": 0.2}
+            },
+            "update": {
+              "x": {"signal": "brush[0]"},
+              "x2": {"signal": "brush[1]"}
+            },
+          }
+        },
+        {
+          "type": "rect",
+          "interactive": false,
+          "encode": {
+            "enter": {
+              "y": {"value": 0},
+              "height": {"value": 100},
+              "width": {"value": 1},
+              "fill": {"value": "firebrick"}
+            },
+            "update": {
+              "x": {"signal": "brush[0]"}
+            }
+          }
+        },
+        {
+          "type": "rect",
+          "interactive": false,
+          "encode": {
+            "enter": {
+              "y": {"value": 0},
+              "height": {"value": 100},
+              "width": {"value": 1},
+              "fill": {"value": "firebrick"}
+            },
+            "update": {
+              "x": {"signal": "brush[1]"}
+            }
+          }
+        }
+      ]
+    },
         {"name": "radial",
         "title": {
           "text": "Airplane crashes by time of day",
