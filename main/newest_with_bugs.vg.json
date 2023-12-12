@@ -548,7 +548,7 @@
         "type": "text",
         "encode": {
               "enter": {
-                "fill": {"value": "black"},
+                "fill": {"value": "#444444"},
                 "x": {"signal": "width/2-100"},
                 "y": {"value": -10},
                 "fontSize": {"value": 16},
@@ -674,7 +674,7 @@
           },
           "update": {
             "opacity": {"value": 0.4},
-            "stroke": {"value": "black"},
+            "stroke": {"value": "red"},
             "x": {"signal": "brushX[0]"},
             "x2": {"signal": "brushX[1]"},
             "y": {"signal": "brushY[0]"},
@@ -685,12 +685,14 @@
       {"name": "histogram",
         "title": {
           "text": "Airplane crashes by manufacturer (top 20)",
-          "fontSize": 16
+          "fontSize": 16,
+          "color": {"value": "#444444"},
+          
         },
         "type": "group",
         "axes": [
-          { "orient": "top", "scale": "xscale" , "title": "# of crashes"},
-          { "orient": "left", "scale": "yscale", "title": "Manufacturer" }
+          { "orient": "top", "scale": "xscale" , "title": "# of crashes", "titleColor": {"value": "#444444"}},
+          { "orient": "left", "scale": "yscale", "title": "Manufacturer", "titleColor": {"value": "#444444"} }
   
           ],
         "marks": [
@@ -716,7 +718,7 @@
                         "test": "indata('selectedManufacturers', 'Manufacturer', datum.Manufacturer)",
                         "value": "firebrick"
                       },
-                      {"value": "silver"}
+                      {"value": "#196CAE"}
                     ]
                   },
                   "hover": {
@@ -775,8 +777,8 @@
         }
       ],
       "axes": [
-          { "orient": "top", "scale": "yearScaleForTimeLine", "format": "d", "tickCount": 20, "title" : "Year" },
-          { "orient": "left", "scale": "countScaleForTimeLine", "title": "# of crashes" }
+          { "orient": "top", "scale": "yearScaleForTimeLine", "format": "d", "tickCount": 20, "title" : "Year", "titleColor": {"value": "#444444"}, "tickColor":{"value": "#444444"}}, 
+          { "orient": "left", "scale": "countScaleForTimeLine", "title": "# of crashes", "titleColor": {"value": "#444444"}, "tickColor": {"value": "#444444"}}
       ],
       "signals": [
         {
@@ -900,7 +902,8 @@
         {"name": "radial",
         "title": {
           "text": "Airplane crashes by time of day",
-          "fontSize": 16
+          "fontSize": 16,
+          "color": {"value": "#444444"}
         },
         "type": "group",
         "clip": false,
@@ -949,7 +952,7 @@
                         "test": "indata('selectedTimeIntervals', 'Time', datum.Time)",
                         "value": "firebrick"
                       },
-                      {"value": "silver"}
+                      {"value": "#196CAE"}
                     ]
               },
               "hover": {
@@ -986,7 +989,7 @@
                 "radius": {"scale": "r", "field": "maxDist",
                  "offset": {"signal": "datum.count === datum.maxDist ? 25 : 20"}},
                 "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
-                "fill": {"signal": "datum.count === datum.maxDist ? '#005ca5' : '#000'"},
+                "fill": {"signal": "datum.count === datum.maxDist ? 'red' : '#444444'"},
                 "align": {"value": "center"},
                 "angle": {"signal": "(((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90) < 270 ? (((datum.startAngle + datum.endAngle)/2 * 57.2957795) - 90) : (((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90)"}, 
                 "baseline": {"value": "middle"},
@@ -1019,14 +1022,14 @@
             "type": "text",
             "encode": {
                   "enter": {
-                    "fill": {"value": "black"},
+                    "fill": {"value": "#444444"},
                     "xc": {"signal": "selectionWidth/2 + 200"},
                     "y": {"value": 10},
                     "fontSize": {"value": 15},
                     "fontStyle": {"value": "bold"},
                     "align": {"value": "center"},
                     "baseline": {"value": "alphabetic"},
-                    "text": {"value": "Select Fatalities Interval"}
+                    "text": {"value": "Select Fatalities Interval"},
                   }
                 }
           },
