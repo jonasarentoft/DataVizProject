@@ -573,7 +573,7 @@
             "from": {"data": "sphere"},
             "encode": {
               "enter": {
-                "fill": {"value": "aliceblue"}
+                "fill": {"value": "white"}
               }
             },
             "transform": [
@@ -989,7 +989,7 @@
                 "radius": {"scale": "r", "field": "maxDist",
                  "offset": {"signal": "datum.count === datum.maxDist ? 25 : 20"}},
                 "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
-                "fill": {"signal": "datum.count === datum.maxDist ? 'red' : '#444444'"},
+                "fill": {"signal": "datum.count === datum.maxDist ? '005ca5' : '#444444'"},
                 "align": {"value": "center"},
                 "angle": {"signal": "(((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90) < 270 ? (((datum.startAngle + datum.endAngle)/2 * 57.2957795) - 90) : (((datum.startAngle + datum.endAngle)/2 * 57.2957795) + 90)"}, 
                 "baseline": {"value": "middle"},
