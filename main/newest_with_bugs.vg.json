@@ -498,7 +498,6 @@
       "domain": {"signal": "fatalityExtent"}
     },
     {"name": "yearScaleForTimeLine",
-      "type": "",
       "round": true,
       "zero": false,
       "range": "width",
